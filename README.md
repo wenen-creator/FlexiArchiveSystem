@@ -1,6 +1,5 @@
 # Flexi Archive System  ![ license](https://img.shields.io/badge/%20license-LGPL--2.1-brightgreen?link=https%3A%2F%2Fgithub.com%2Fwenen-creator%2FFlexiArchiveSystem%2Fblob%2Fmaster%2FLICENSE)
 
----
 &ensp;&ensp;正如 Flexi Archive System 名字一样，Flexi Archive System 以 Flexible 为设计理念，旨在通过其高度可扩展性、易上手、高性能以及完善的工具等特点，提供一个满足复杂存档需求的灵活而强大的解决方案。
 
 &ensp;&ensp;在Flexi Archive System中你可以用轻松地几行代码跨平台保存几乎任何东西，同时Flexi Archive System以其高度可扩展的架构设计，允许你根据实际需求轻松的自定义数据类型和存档策略、数据格式。
