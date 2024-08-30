@@ -36,17 +36,17 @@ namespace FlexiArchiveSystem.U3DEditor
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Key:", GUILayout.Width(50));
-            EditorGUILayout.TextField(Key, GUIStyleSetting.Instance.textAreaStyle);
+            EditorGUILayout.TextField(Key, FlexiGUIStyleSetting.Instance.textAreaStyle);
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Memory:", GUILayout.Width(50));
-            EditorGUILayout.TextArea(ResultWrapper.result, GUIStyleSetting.Instance.textAreaStyle);
+            EditorGUILayout.TextArea(ResultWrapper.result, FlexiGUIStyleSetting.Instance.textAreaStyle);
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Disk:", GUILayout.Width(50));
-            EditorGUILayout.TextArea(ResultWrapper.diskResult, GUIStyleSetting.Instance.textAreaStyle,
+            EditorGUILayout.TextArea(ResultWrapper.diskResult, FlexiGUIStyleSetting.Instance.textAreaStyle,
                 GUILayout.ExpandHeight(true));
             EditorGUILayout.EndHorizontal();
 

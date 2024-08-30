@@ -8,6 +8,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using FlexiArchiveSystem.Assist;
 using UnityEditor;
@@ -56,6 +57,11 @@ namespace FlexiArchiveSystem.U3DEditor
             
             EditorApplication.playModeStateChanged += _window.OnPlayModeStateChanged;
             CompileListener.RegisterEvent(_window.WhenCompile);
+
+            if (Application.isPlaying == false)
+            {
+                InitAllArchiveManager();
+            }
         }
 
         private void WhenCompile()
@@ -157,7 +163,7 @@ namespace FlexiArchiveSystem.U3DEditor
                     DataArchiveManager = mgr;
                     if (mgr != null)
                     {
-                        DataArchiveSetting = setting;
+                        DataArchiveSetting = DataArchiveManager.ArchiveSetting;
                         AllArchiveID = DataArchiveSetting.GetAllArchiveID();
                         isNonArchiveError = AllArchiveID == null || AllArchiveID.Count == 0;
                         selectArchiveID = DataArchiveSetting.CurrentArchiveID;
@@ -323,7 +329,7 @@ namespace FlexiArchiveSystem.U3DEditor
             methodInfo_GetData = methodInfo_GetData.MakeGenericMethod(dataTypeSystemType);
 
             object dataType = methodInfo_GetData.Invoke(dataObject, null);
-            Type genericDataType = Assembly.GetAssembly(typeof(IDataType)).GetType("AbstractDataType`1");
+            Type genericDataType = Assembly.GetAssembly(typeof(IDataType)).GetType("FlexiArchiveSystem.AbstractDataType`1");
             genericDataType = genericDataType.MakeGenericType(valueType);
             var methodInfo_DiskToStr =
                 genericDataType.GetMethod("DiskDataToString", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -411,6 +417,22 @@ namespace FlexiArchiveSystem.U3DEditor
             DataArchiveSetting.SetArchiveID(selectArchiveID, false);
             DataArchiveSetting.CreateOrRebuildArchiveOperation();
             keyValuePairs.Clear();
+        }
+
+        private static void InitAllArchiveManager()
+        {
+            Type IFlexiType = typeof(IFlexiDataArchiveManager);
+            Assembly assembly = Assembly.GetAssembly(IFlexiType);
+            Type[] types = assembly.GetTypes();
+
+            var archiveMgrTypes= types.Where((t)=> t.BaseType != null && t.BaseType.Name == IFlexiType.Name);
+            foreach (var type in archiveMgrTypes)
+            {
+                // IFlexiDataArchiveManager archiveMgr = (IFlexiDataArchiveManager)type.GetField("instance", BindingFlags.Static|BindingFlags.Public).GetValue(null);
+                
+                IFlexiDataArchiveManager archiveMgr = Activator.CreateInstance(type) as IFlexiDataArchiveManager;
+                archiveMgr.Init();
+            }
         }
     }
 }

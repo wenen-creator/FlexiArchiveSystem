@@ -22,11 +22,23 @@ namespace FlexiArchiveSystem.Assist
                 ArchiveMgrCollections.Add(mgr);
             }
         }
+        
+        public void RemoveRegister(IFlexiDataArchiveManager mgr)
+        {
+            if (ArchiveMgrCollections.Contains(mgr))
+            {
+                ArchiveMgrCollections.Remove(mgr);
+            }
+        }
 
         public IFlexiDataArchiveManager FindByArchiveSetting(IArchiveSetting archiveSetting)
         {
             for (int i = 0; i < ArchiveMgrCollections.Count; i++)
             {
+                if (ArchiveMgrCollections[i].ArchiveSetting == null)
+                {
+                    continue;
+                }
                 if (ArchiveMgrCollections[i].ArchiveSetting.name == archiveSetting.Name)
                 {
                     return ArchiveMgrCollections[i];

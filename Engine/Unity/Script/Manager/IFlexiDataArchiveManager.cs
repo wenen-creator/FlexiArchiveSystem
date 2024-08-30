@@ -16,25 +16,19 @@ namespace FlexiArchiveSystem
     /// <summary>
     /// 存档系统
     /// </summary>
-    public abstract partial class IFlexiDataArchiveManager : IDisposable
+    public abstract partial class IFlexiDataArchiveManager : IDisposable 
     {
         public FlexiArchiveSetting ArchiveSetting { get; protected set; }
-
+        
         protected DataArchiveContainer ArchiveContainer;
-
-        public IFlexiDataArchiveManager()
-        {
-#if UNITY_EDITOR
-            if (UnityEngine.Application.isPlaying == false)
-            {
-                Init();
-            }
-#endif
-        }
 
         public void Init()
         {
             var settingInfo = LoadDataArchiveSettingFromDisk();
+            if (settingInfo.ArchiveSetting == null)
+            {
+                return;
+            }
             SetDataArchiveSetting(settingInfo.ArchiveSetting as FlexiArchiveSetting);
             SetDataArchiveSettingName(settingInfo.SettingName);
             InitDataArchiveSetting();
@@ -55,13 +49,13 @@ namespace FlexiArchiveSystem
             UnityEngine.Application.quitting += OnApplicationQuit;
         }
 
-
         public void SetDataArchiveSetting(FlexiArchiveSetting setting)
         {
 #if UNITY_EDITOR
             if (UnityEngine.Application.isPlaying == false)
             {
                 ArchiveSetting = UnityEngine.ScriptableObject.CreateInstance<FlexiArchiveSetting>();
+                
                 ArchiveSetting.ArchiveOperationMode = setting.ArchiveOperationMode;
                 ArchiveSetting.hideFlags = UnityEngine.HideFlags.DontSave;
                 return;
