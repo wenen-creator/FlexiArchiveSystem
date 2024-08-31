@@ -1,6 +1,6 @@
 # Flexi Archive System  [![license](https://img.shields.io/badge/%20license-LGPL--2.1-brightgreen?link=https%3A%2F%2Fgithub.com%2Fwenen-creator%2FFlexiArchiveSystem%2Fblob%2Fmaster%2FLICENSE)](https://github.com/wenen-creator/FlexiArchiveSystem/blob/master/LICENSE)  [![license](https://img.shields.io/badge/Author-%E6%B8%A9%E6%96%87-blue?color=%2333A1C9)](https://github.com/wenen-creator)
 
-&ensp;&ensp;**Flexi Archive**是一个专门为Unity3D设计的数据存档工具。
+&ensp;&ensp;*Flexi Archive* 是一个专门为 Unity3D 设计的数据存档工具。
 
 &ensp;&ensp;正如 *Flexi Archive* 名字一样，*Flexi Archive* 以 **Flexible** 为设计理念，旨在通过其高度可扩展性、易上手、高性能以及完善的工具等特点，提供一个满足复杂存档需求的灵活而强大的解决方案。
 
@@ -9,15 +9,15 @@
 
 ## 文档
 
-&ensp;&ensp;建议你在使用 *Flexi Archive* 前，先打开**Sample**案例。
+&ensp;&ensp;建议你在使用 *Flexi Archive* 前，先打开 **Sample** 案例。
 
-&ensp;&ensp;在Sample案例中，你可以快速学习到 Flexi Archive System 的核心功能。
+&ensp;&ensp;在 Sample 案例中，你可以快速学习到 *Flexi Archive System* 的核心功能。
 
 ## 系统特点
 
 ### 1.支持同一设备下多账号存档共存 
 
-&ensp;&ensp;在用户登录成功后设置USER_KEY即可。若你的程序无登录业务，你可以不用设置。
+&ensp;&ensp;在用户登录成功后设置 USER_KEY 即可。若你的程序无登录业务，你可以不用设置。
 示例：
 
 ``` C#
@@ -33,7 +33,7 @@
 
 ### 3.支持多种序列化方式 
 
-&ensp;&ensp;支持File、PlayerPrefs、SQL-DB序列化（存档/读档）方式。你可以根据项目模块需求以及性能考量，自由决定该模块存档系统所使用的序列化方式，默认为SQL-DB方式。
+&ensp;&ensp;支持 File、PlayerPrefs、SQL-DB 序列化（存档/读档）方式。你可以根据项目模块需求以及性能考量，自由决定该模块存档系统所使用的序列化方式，默认为 SQL-DB 方式。
 
 &ensp;&ensp;多存档支持：
 
@@ -54,13 +54,13 @@
 
 ### 5.保存点存档 
 
-&ensp;&ensp;你需要在合适的时机，触发存档操作。否则你对数据的修改，只会使Memory的数据发生变化。
+&ensp;&ensp;你需要在合适的时机，触发存档操作。否则你对数据的修改，只会使 Memory 的数据发生变化。
 
 &ensp;&ensp;值得一提的是，Flexi Archive System 只会对发生变化的数据进行存档。
 
 ### 6.分组策略 
 
-&ensp;&ensp;Flexi Archive System 使用GroupKey+DataKey的分组策略，你可以根据你的业务来对数据进行分组。 
+&ensp;&ensp;Flexi Archive System 使用 GroupKey + DataKey 的分组策略，你可以根据你的业务来对数据进行分组。 
 
 &ensp;&ensp;合理的分组有助于降低存档的开销。 
 
@@ -68,11 +68,11 @@
 
 ### 7.支持任何复杂类型或自定义类型 
 
-&ensp;&ensp;Flexi Archive System支持轻松添加新的数据类型和存档策略，允许你存档自定义的复杂类型数据。 
+&ensp;&ensp;Flexi Archive System 支持轻松添加新的数据类型和存档策略，允许你存档自定义的复杂类型数据。 
 
-&ensp;&ensp;如果你需要存档一个自定义类型，你无需关心存档过程中所做的操作，也无需对系统进行修改。你只需负责创建一个CustomData以及一个AbstractDataType<CustomData>具体类型，按照Litjson所支持的类型要求对复杂的数据进行转换。 
+&ensp;&ensp;如果你需要存档一个自定义类型，你无需关心存档过程中所做的操作，也无需对系统进行修改。你只需负责创建一个 CustomData 以及一个 AbstractDataType<CustomData> 具体类型，按照Litjson所支持的类型要求对复杂的数据进行转换。 
 
-&ensp;&ensp;建议你在编写Wrapper的同时对ToString方法进行重写，方便数据以明文的形式显示在开发环境中。
+&ensp;&ensp;建议你在编写 Wrapper 的同时对 ToString 方法进行重写，方便数据以明文的形式显示在开发环境中。
 
 代码示例（Plan A）： 
 ```C#
@@ -148,10 +148,10 @@
 
 ### 8.数据存档监视工具 
 
-&ensp;&ensp;Flexi Archive System提供了与系统层配套的数据查询工具，方便你在运行时实时的监视数据的变化（支持非运行时和运行时使用）。
+&ensp;&ensp;Flexi Archive System 提供了与系统层配套的数据查询工具，方便你在运行时实时的监视数据的变化（支持非运行时和运行时使用）。
 
 ### 9.性能
-&ensp;&ensp;Flexi Archive System系统内部采用了高效的存储机制。默认采用按需载入原则，引入缓存机制、分组策略、脏标记等大量优化策略，确保在进行大量频繁的数据操作时，也能够快速响应，尽可能的避免复杂情况下帧率波动等性能问题。
+&ensp;&ensp;Flexi Archive System 系统内部采用了高效的存储机制。默认采用按需载入原则，引入缓存机制、分组策略、脏标记等大量优化策略，确保在进行大量频繁的数据操作时，也能够快速响应，尽可能的避免复杂情况下帧率波动等性能问题。
 
 ## 关于作者
 
