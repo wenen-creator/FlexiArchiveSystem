@@ -1,4 +1,4 @@
-# Flexi Archive System  [![license](https://img.shields.io/badge/%20license-LGPL--2.1-brightgreen?link=https%3A%2F%2Fgithub.com%2Fwenen-creator%2FFlexiArchiveSystem%2Fblob%2Fmaster%2FLICENSE)](https://github.com/wenen-creator/FlexiArchiveSystem/blob/master/LICENSE)  [![license](https://img.shields.io/badge/Author-%E6%B8%A9%E6%96%87-blue?color=%2333A1C9)](https://github.com/wenen-creator)
+# Flexi Archive System  [![license](https://img.shields.io/badge/%20license-LGPL--2.1-brightgreen?link=https%3A%2F%2Fgithub.com%2Fwenen-creator%2FFlexiArchiveSystem%2Fblob%2Fmaster%2FLICENSE)](https://github.com/wenen-creator/FlexiArchiveSystem/blob/master/LICENSE)  [![license](https://img.shields.io/badge/Author-%E6%B8%A9%E6%96%87-blue?color=%2333A1C9)](https://github.com/wenen-creator) [![CLA assistant](https://cla-assistant.io/readme/badge/wenen-creator/FlexiArchiveSystem)](https://cla-assistant.io/wenen-creator/FlexiArchiveSystem)
 
 &ensp;&ensp;*Flexi Archive* 是一个专门为 Unity3D 设计的数据存档工具。
 
