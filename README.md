@@ -1,15 +1,17 @@
-# Flexi Archive System  ![ license](https://img.shields.io/badge/%20license-LGPL--2.1-brightgreen?link=https%3A%2F%2Fgithub.com%2Fwenen-creator%2FFlexiArchiveSystem%2Fblob%2Fmaster%2FLICENSE)
+# Flexi Archive System  [![license](https://img.shields.io/badge/%20license-LGPL--2.1-brightgreen?link=https%3A%2F%2Fgithub.com%2Fwenen-creator%2FFlexiArchiveSystem%2Fblob%2Fmaster%2FLICENSE)](https://github.com/wenen-creator/FlexiArchiveSystem/blob/master/LICENSE)  [![license](https://img.shields.io/badge/Author-%E6%B8%A9%E6%96%87-blue?color=%2333A1C9)](https://github.com/wenen-creator)
 
-&ensp;&ensp;正如 Flexi Archive System 名字一样，Flexi Archive System 以 Flexible 为设计理念，旨在通过其高度可扩展性、易上手、高性能以及完善的工具等特点，提供一个满足复杂存档需求的灵活而强大的解决方案。
+&ensp;&ensp;**Flexi Archive**是一个专门为Unity3D设计的数据存档工具。
 
-&ensp;&ensp;在Flexi Archive System中你可以用轻松地几行代码跨平台保存几乎任何东西，同时Flexi Archive System以其高度可扩展的架构设计，允许你根据实际需求轻松的自定义数据类型和存档策略、数据格式。
+&ensp;&ensp;正如 *Flexi Archive* 名字一样，*Flexi Archive* 以 **Flexible** 为设计理念，旨在通过其高度可扩展性、易上手、高性能以及完善的工具等特点，提供一个满足复杂存档需求的灵活而强大的解决方案。
+
+&ensp;&ensp;在 *Flexi Archive System* 中你可以用轻松地几行代码跨平台保存几乎任何东西，同时 *Flexi Archive System* 以其高度可扩展的架构设计，允许你根据实际需求轻松的自定义数据类型和存档策略、数据格式。
 
 
 ## 文档
 
-&ensp;&ensp;建议你在使用Flexi Archive System前，先打开Sample案例。
+&ensp;&ensp;建议你在使用 *Flexi Archive* 前，先打开**Sample**案例。
 
-&ensp;&ensp;在Sample案例中，你可以快速学习到Flexi Archive System的核心功能。
+&ensp;&ensp;在Sample案例中，你可以快速学习到 Flexi Archive System 的核心功能。
 
 ## 系统特点
 
@@ -150,8 +152,6 @@
 
 ### 9.性能
 &ensp;&ensp;Flexi Archive System系统内部采用了高效的存储机制。默认采用按需载入原则，引入缓存机制、分组策略、脏标记等大量优化策略，确保在进行大量频繁的数据操作时，也能够快速响应，尽可能的避免复杂情况下帧率波动等性能问题。
-
-
 
 ## 关于作者
 
