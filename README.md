@@ -13,6 +13,8 @@
 
 &ensp;&ensp;在 Sample 案例中，你可以快速学习到 *Flexi Archive System* 的核心功能。
 
+![img](https://github.com/wenen-creator/FlexiArchiveSystem/blob/dev/Misc/img/preview01.PNG)
+
 ## 系统特点
 
 ### 1.支持同一设备下多账号存档共存 
@@ -149,6 +151,8 @@
 ### 8.数据存档监视工具 
 
 &ensp;&ensp;Flexi Archive System 提供了与系统层配套的数据查询工具，方便你在运行时实时的监视数据的变化（支持非运行时和运行时使用）。
+
+![img](https://github.com/wenen-creator/FlexiArchiveSystem/blob/dev/Misc/img/preview02.PNG)
 
 ### 9.性能
 &ensp;&ensp;Flexi Archive System 系统内部采用了高效的存储机制。默认采用按需载入原则，引入缓存机制、分组策略、脏标记等大量优化策略，确保在进行大量频繁的数据操作时，也能够快速响应，尽可能的避免复杂情况下帧率波动等性能问题。
