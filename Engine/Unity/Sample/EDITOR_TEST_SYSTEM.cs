@@ -5,7 +5,6 @@
 //        email: yixiangluntan@163.com
 //-------------------------------------------------
 
-#if UNITY_EDITOR
 using UnityEngine;
 
 namespace FlexiArchiveSystem.Sample
@@ -115,4 +114,3 @@ namespace FlexiArchiveSystem.Sample
 		}
 	}
 }
-#endif

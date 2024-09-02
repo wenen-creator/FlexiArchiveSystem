@@ -62,7 +62,6 @@ namespace FlexiArchiveSystem
             }
 #endif
             ArchiveSetting = setting;
-            ArchiveSetting.hideFlags = UnityEngine.HideFlags.DontSave;
         }
 
         private void SetDataArchiveSettingName(string settingName)
