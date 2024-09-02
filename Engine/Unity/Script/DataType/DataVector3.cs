@@ -9,38 +9,40 @@ using UnityEngine;
 
 namespace FlexiArchiveSystem
 {
-    public class DataVector2 : AbstractDataType<Vector2Wrapper>
+    public class DataVector3 : AbstractDataType<Vector3Wrapper>
     {
-        public DataVector2(string dataStr) : base(dataStr)
+        public DataVector3(string dataStr) : base(dataStr)
         {
 
         }
     }
 
-    public struct Vector2Wrapper
+    public struct Vector3Wrapper
     {
         public float x;
         public float y;
+        public float z;
 
-        public Vector2Wrapper(Vector2 value)
+        public Vector3Wrapper(Vector3 value)
         {
             x = value.x;
             y = value.y;
+            z = value.z;
         }
 
-        public static implicit operator Vector2Wrapper(Vector2 value)
+        public static implicit operator Vector3Wrapper(Vector3 value)
         {
-            return new Vector2Wrapper(value);
+            return new Vector3Wrapper(value);
         }
 
-        public static implicit operator Vector2(Vector2Wrapper wrapper)
+        public static implicit operator Vector3(Vector3Wrapper wrapper)
         {
-            return new Vector2((float)wrapper.x, (float)wrapper.y);
+            return new Vector3((float)wrapper.x, (float)wrapper.y,  (float)wrapper.z);
         }
 
         public override string ToString()
         {
-            return string.Format("({0},{1})", x, y);
+            return string.Format("({0},{1},{2})",  x, y, z);
         }
     }
 }

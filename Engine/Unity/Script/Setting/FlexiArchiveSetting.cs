@@ -17,7 +17,7 @@ namespace FlexiArchiveSystem
     [CreateAssetMenu(fileName = "DataArchiveSetting", menuName = "Flexi Archive System/DataArchiveSetting")]
     public partial class FlexiArchiveSetting : ScriptableObject, IArchiveSetting
     {
-        [SerializeField] private ArchiveOperationType archiveOperationType;
+        [SerializeField] private ArchiveOperationType archiveOperationType = ArchiveOperationType.Sqlite;
 
         public ArchiveOperationType ArchiveOperationMode
         {
