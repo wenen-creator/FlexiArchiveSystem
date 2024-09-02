@@ -74,6 +74,39 @@ namespace FlexiArchiveSystem.Entry
 
             dirtyDataGroupList.Clear();
         }
+        
+        public void SaveGroup(string group_key)
+        {
+            int index = dirtyDataGroupList.IndexOf(group_key);
+            if (index < 0)
+            {
+                return;
+            }
+            var groupObject = GetCacheDataGroup(group_key);
+            if (groupObject != null)
+            {
+                groupObject.Save();
+                dirtyDataGroupList.RemoveAt(index);
+            }
+        }
+        
+        public void SaveGroup(params string[] group_keys)
+        {
+            foreach (var group_key in group_keys)
+            {
+                int index = dirtyDataGroupList.IndexOf(group_key);
+                if (index < 0)
+                {
+                    continue;
+                }
+                var groupObject = GetCacheDataGroup(group_key);
+                if (groupObject != null)
+                {
+                    groupObject.Save();
+                    dirtyDataGroupList.RemoveAt(index);
+                }
+            }
+        }
 
         public void Delete(string group_key, string data_key)
         {

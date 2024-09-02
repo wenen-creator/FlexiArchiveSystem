@@ -104,6 +104,16 @@ namespace FlexiArchiveSystem
             ArchiveContainer.Save();
         }
 
+        public void SaveGroup(string group_key)
+        {
+            ArchiveContainer.SaveGroup(group_key);
+        }
+        
+        public void SaveGroup(params string[] groups)
+        {
+            ArchiveContainer.SaveGroup(groups);
+        }
+
         public void Delete(string groupKey, string dataKey)
         {
             ArchiveContainer.Delete(groupKey, dataKey);
