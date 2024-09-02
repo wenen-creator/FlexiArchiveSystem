@@ -13,6 +13,8 @@ namespace FlexiArchiveSystem.Sample
 	[ExecuteInEditMode]
 	public partial class DemoSample
 	{
+		private string write_str;
+		private string read_str;
 		void OnGUI()
 		{
 			GUI.Label(new Rect(Screen.width/2 - 65,Screen.height - 90,130,50),"Flexi Archive System");
@@ -33,6 +35,29 @@ namespace FlexiArchiveSystem.Sample
 			GUI.Label(new Rect(10, 50, 500, 50),
 				$"Current Archive Index : {archiveManager.ArchiveSetting.CurrentArchiveID}  .");
 
+			if (string.IsNullOrEmpty(write_str) == false)
+			{
+				GUI.Label(new Rect(10, 90, 500, 50),
+					$"Write : {write_str}  .");
+			}
+
+			if (string.IsNullOrEmpty(read_str) == false)
+			{
+				if (string.IsNullOrEmpty(write_str) == false)
+				{
+					GUI.Label(new Rect(10, 90, 500, 50),
+						$"Write : {write_str}  .");
+					GUI.Label(new Rect(10, 130, 500, 50),
+						$"Read : {read_str}  .");
+				}
+				else
+				{
+					GUI.Label(new Rect(10, 90, 500, 50),
+						$"Read : {read_str}  .");
+				}
+				
+			}
+			
 			var groundWidth = 400;
 			var groundHeight = 150;
 			var screenWidth = Screen.width;
@@ -43,32 +68,32 @@ namespace FlexiArchiveSystem.Sample
 			GUI.Box(new Rect(0, 0, groundWidth, groundHeight), "Select");
 			if (GUI.Button(new Rect(10, 30, 120, 30), "1.write(1-1)"))
 			{
-				Demo1_WriteStr();
+				write_str = Demo1_WriteStr();
 			}
 
 			if (GUI.Button(new Rect(10, 70, 120, 30), "2.read(1-1)"))
 			{
-				Demo2_ReadStrFromDisk();
+				read_str = Demo2_ReadStrFromDisk();
 			}
 
 			if (GUI.Button(new Rect(10, 110, 120, 30), "3.write(2-1):num"))
 			{
-				Demo3_WriteInt();
+				write_str = Demo3_WriteInt();
 			}
 
 			if (GUI.Button(new Rect(140, 30, 120, 30), "4.read(2-1):num"))
 			{
-				Demo4_ReadIntFromDisk();
+				read_str = Demo4_ReadIntFromDisk();
 			}
 
 			if (GUI.Button(new Rect(140, 70, 120, 30), "5.write(2-2):vec2"))
 			{
-				Demo5_WriteVector2();
+				write_str = Demo5_WriteVector2();
 			}
 
 			if (GUI.Button(new Rect(140, 110, 120, 30), "6.read(2-2):vec2"))
 			{
-				Demo6_ReadVector2();
+				read_str = Demo6_ReadVector2();
 			}
 
 			if (GUI.Button(new Rect(270, 30, 120, 30), "7.save"))

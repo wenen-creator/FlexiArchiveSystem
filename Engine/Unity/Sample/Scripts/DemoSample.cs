@@ -29,53 +29,59 @@ namespace FlexiArchiveSystem.Sample
 			archiveManager = DataManagerSample.instance;
 		}
 
-		private void Demo1_WriteStr()
+		private string Demo1_WriteStr()
 		{
 			DataObject dataObject = archiveManager.GetDataObject("group1", "key1");
 			DataString dataString = dataObject.GetData<DataString>();
 			dataString.Write(char.ConvertFromUtf32(Random.Range(65, 123)));
 			Debug.Log(string.Format($"[{Path.Combine("group1", "key1")}]: write a str ：{dataString.data}"));
+			return dataString.data;
 		}
 
-		private void Demo2_ReadStrFromDisk()
+		private string Demo2_ReadStrFromDisk()
 		{
 			DataObject dataObject = archiveManager.GetDataObject("group1", "key1");
 			DataString dataString = dataObject.GetData<DataString>();
 			string str = dataString.DiskData;
 			Debug.Log(string.Format($"[{Path.Combine("group1", "key1")}]: read a str from disk: {str}"));
+			return str;
 		}
 
-		private void Demo3_WriteInt()
+		private string Demo3_WriteInt()
 		{
 			DataObject dataObject = archiveManager.GetDataObject("group2", "num1");
 			DataInteger dataInteger = dataObject.GetData<DataInteger>();
 			dataInteger.Write(Random.Range(0, 5));
 			Debug.Log(string.Format(
 				$"[{Path.Combine("group2", "num1")}]: write a number of type int {dataInteger.data}"));
+			return dataInteger.data.ToString();
 		}
 
-		private void Demo4_ReadIntFromDisk()
+		private string Demo4_ReadIntFromDisk()
 		{
 			DataObject dataObject = archiveManager.GetDataObject("group2", "num1");
 			DataInteger dataInteger = dataObject.GetData<DataInteger>();
 			Debug.Log(string.Format(
 				$"[{Path.Combine("group2", "num1")}]: read a int from disk  : {dataInteger.DiskData}"));
+			return dataInteger.DiskData.ToString();
 		}
 
-		private void Demo5_WriteVector2()
+		private string Demo5_WriteVector2()
 		{
 			DataObject dataObject = archiveManager.GetDataObject("group2", "key2");
 			DataVector2 dataVector2 = dataObject.GetData<DataVector2>();
 			dataVector2.Write(new Vector2(Random.Range(0, 100), Random.Range(0, 100)));
 			Debug.Log(string.Format($"[{Path.Combine("group2", "key2")}]: write a vector2 ：{dataVector2.data}"));
+			return dataVector2.data.ToString();
 		}
 
-		private void Demo6_ReadVector2()
+		private string Demo6_ReadVector2()
 		{
 			DataObject dataObject = archiveManager.GetDataObject("group2", "key2");
 			DataVector2 dataVector2 = dataObject.GetData<DataVector2>();
 			Debug.Log(string.Format(
 				$"[{Path.Combine("group2", "key2")}]: read a vector2 from disk：{dataVector2.DiskData}"));
+			return dataVector2.DiskData.ToString();
 		}
 
 		private void Demo7_SavePoint()
