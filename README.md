@@ -35,7 +35,7 @@
 
 ### 3.支持多种序列化方式 
 
-&ensp;&ensp;支持 File、PlayerPrefs、SQL-DB 序列化（存档/读档）方式。你可以根据项目模块需求以及性能考量，自由决定该模块存档系统所使用的序列化方式，默认为 SQL-DB 方式。
+&ensp;&ensp;支持 File、PlayerPrefs、SQL-DB 异步序列化（存档/读档）方式。你可以根据项目模块需求以及性能考量，自由决定该模块存档系统所使用的序列化方式，默认为 SQL-DB 方式。
 
 &ensp;&ensp;多存档支持：
 
@@ -155,7 +155,7 @@
 ![img](https://github.com/wenen-creator/FlexiArchiveSystem/blob/dev/Misc/img/preview02.PNG)
 
 ### 9.性能
-&ensp;&ensp;Flexi Archive System 系统内部采用了高效的存储机制。默认采用按需载入原则，引入缓存机制、分组策略、脏标记等大量优化策略，确保在进行大量频繁的数据操作时，也能够快速响应，尽可能的避免复杂情况下帧率波动等性能问题。
+&ensp;&ensp;Flexi Archive System 系统内部采用了高效的存储机制。默认采用按需载入原则，引入异步IO、缓存机制、分组策略、脏标记等大量优化策略，确保在进行大量频繁的数据操作时，也能够快速响应，尽可能的避免复杂情况下帧率波动等性能问题。
 
 ## 关于作者
 
