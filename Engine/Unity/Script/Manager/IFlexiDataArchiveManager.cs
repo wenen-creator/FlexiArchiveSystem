@@ -99,10 +99,9 @@ namespace FlexiArchiveSystem
             return ArchiveContainer.GetDataGroup(groupKey);
         }
 
-        public void Save()
-        {
-            ArchiveContainer.Save();
-        }
+        public void Save() => ArchiveContainer.Save();
+
+        public void SaveAsync(Action complete = null) => ArchiveContainer.SaveAsync(complete);
 
         public void SaveGroup(string group_key)
         {

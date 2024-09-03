@@ -27,6 +27,7 @@ namespace FlexiArchiveSystem
 
         [SerializeField] private bool isLog = true;
         public bool IsLog => isLog;
+
         public int CurrentArchiveID { get; private set; }
         public List<int> AllArchiveID { get; private set; }
         public IDataArchiveOperation DataArchiveOperation { get; set; }

@@ -140,6 +140,53 @@ namespace FlexiArchiveSystem.ArchiveOperation
             }
         }
 
+        public async Task DataPersistentAsync(string key, string dataStr, Action complete)
+        {
+            if (connection == null)
+            {
+                InitDBConnection();
+            }
+            
+            var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(key);
+            string groupKey = keyTuple.Item1;
+            string dataKey = keyTuple.Item2;
+
+            string queryGroupTableCmd = $"select name from sqlite_master where type='table' and name='{groupKey}'";
+            SqliteCommand groupCommand = new SqliteCommand(queryGroupTableCmd, connection);
+            var cmdReader = await (groupCommand.ExecuteReaderAsync());
+            bool exsitTable = (await cmdReader.ReadAsync());
+            
+            if (exsitTable == false)
+            {
+                //create table
+                string createTableCmd = $"create table {groupKey}(dataKey varchar(32) PRIMARY KEY,data varchar(32));";
+                SqliteCommand createTableCommand = new SqliteCommand(createTableCmd, connection);
+                await createTableCommand.ExecuteNonQueryAsync();
+            }
+
+            string updateDataCmd = $"INSERT OR REPLACE into {groupKey} (dataKey,data) values ('{dataKey}','{dataStr}')";
+            SqliteCommand queryDataCommand = new SqliteCommand(updateDataCmd, connection);
+            await queryDataCommand.ExecuteNonQueryAsync();
+
+            bool isExist = TryGetData(groupKey, dataKey, out string lastResult);
+            if (isExist == false)
+            {
+                if (dataMap.ContainsKey(groupKey) == false)
+                {
+                    dataMap.Add(groupKey, new Dictionary<string, string>());
+                }
+            }
+
+            dataMap[groupKey][dataKey] = dataStr;
+            bool hasExistedBefore = string.IsNullOrEmpty(lastResult) == false;
+            if (hasExistedBefore == false)
+            {
+                TryRecordKey(groupKey, dataKey);
+            }
+            
+            complete?.Invoke();
+        }
+
         public string Read(string key)
         {
             if (File.Exists(FilePath) == false)

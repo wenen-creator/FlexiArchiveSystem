@@ -82,6 +82,11 @@ namespace FlexiArchiveSystem.ArchiveOperation
             }
         }
 
+        public async Task DataPersistentAsync(string key, string dataStr, Action complete)
+        {
+            throw new NotImplementedException("PlayerPrefs does not support async saving");
+        }
+
         public string Read(string key)
         {
             var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(key);

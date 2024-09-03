@@ -18,6 +18,9 @@ namespace FlexiArchiveSystem.ArchiveOperation
         public void Init(int archiveID);
         public void SetArchiveID(int archiveID);
         public void DataPersistent(string key, string dataStr);
+        
+        public Task DataPersistentAsync(string key, string dataStr, Action complete);
+        
         public string Read(string key);
         public Task DeleteAll();
         public void Delete(string key);

@@ -6,6 +6,7 @@
 //-------------------------------------------------
 
 using System;
+using System.Threading.Tasks;
 using FlexiArchiveSystem.ArchiveOperation;
 
 namespace FlexiArchiveSystem
@@ -23,6 +24,12 @@ namespace FlexiArchiveSystem
       private IArchiveSetting _ArchiveSetting;
 
       public bool isDirty { get; protected set; }
+
+      private bool isAsyncSave;
+      
+      private Action aysncSaveComplete;
+      
+      private Task aysncSaveTask;
 
       public string Key
       {
@@ -87,16 +94,49 @@ namespace FlexiArchiveSystem
       private void OnDataPersistent(string dataStr, DataTypeSystemInfo dataTypeSystemInfo)
       {
          isDirty = false;
-         ArchiveOperation.DataPersistent(_Key, dataStr);
-         _ArchiveSetting.DataTypeSystemInfoOperation.ToSaveDataTypeSystemInfo(_Key, dataTypeSystemInfo);
-         OnPersistentHandler?.Invoke(_Key);
+         
+         if (isAsyncSave)
+         {
+            var temp = aysncSaveComplete;
+            aysncSaveTask = ArchiveOperation.DataPersistentAsync(_Key, dataStr, () =>
+            {
+               temp?.Invoke();
+               _ArchiveSetting.DataTypeSystemInfoOperation.ToSaveDataTypeSystemInfo(_Key, dataTypeSystemInfo);
+               //TODO : 立刻执行还是等待任务完成
+               OnPersistentHandler?.Invoke(_Key);
+            });
+         }
+         else
+         {
+            ArchiveOperation.DataPersistent(_Key, dataStr);
+            _ArchiveSetting.DataTypeSystemInfoOperation.ToSaveDataTypeSystemInfo(_Key, dataTypeSystemInfo);
+            OnPersistentHandler?.Invoke(_Key);
+         }
+         
+         
+         aysncSaveComplete = null;
       }
 
       public void Save()
       {
          if (isDirty)
          {
+            isAsyncSave = false;
             _dataType.ToPersistent();
+         }
+      }
+      
+      public async Task SaveAsync(Action complete = null)
+      {
+         if (isDirty)
+         {
+            isAsyncSave = true;
+            aysncSaveComplete = complete;
+            _dataType.ToPersistent();
+            if (aysncSaveTask != null)
+            {
+               await aysncSaveTask;
+            }
          }
       }
 

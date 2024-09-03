@@ -14,6 +14,7 @@ namespace FlexiArchiveSystem.Sample
 	{
 		private string write_str;
 		private string read_str;
+		private bool isAsync = true;
 		void OnGUI()
 		{
 			GUI.Label(new Rect(Screen.width/2 - 65,Screen.height - 90,130,50),"Flexi Archive System");
@@ -65,6 +66,7 @@ namespace FlexiArchiveSystem.Sample
 			var groupy = (screenHeight - groundHeight) / 2;
 			GUI.BeginGroup(new Rect(groupx, groupy, groundWidth, groundHeight));
 			GUI.Box(new Rect(0, 0, groundWidth, groundHeight), "Select");
+			isAsync = GUI.Toggle(new Rect(groundWidth - 80, 2, 80, 30),isAsync, "IsAsync");
 			if (GUI.Button(new Rect(10, 30, 120, 30), "1.write(1-1)"))
 			{
 				write_str = Demo1_WriteStr();
@@ -97,7 +99,7 @@ namespace FlexiArchiveSystem.Sample
 
 			if (GUI.Button(new Rect(270, 30, 120, 30), "7.save"))
 			{
-				Demo7_SavePoint();
+				Demo7_SavePoint(isAsync);
 			}
 
 			if (GUI.Button(new Rect(270, 70, 120, 30), "8.DeleteAll"))

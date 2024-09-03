@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using FlexiArchiveSystem.ArchiveOperation;
 using FlexiArchiveSystem.Assist;
 
@@ -72,6 +73,20 @@ namespace FlexiArchiveSystem.Entry
                 dataGroupObject.Save();
             }
 
+            dirtyDataGroupList.Clear();
+        }
+        
+        public async void SaveAsync(Action allComplete)
+        {
+            //TODO : cancel token
+            IList<Task> saveList = new List<Task>();
+            foreach (var dirtyDataGroup in dirtyDataGroupList)
+            {
+                DataGroup dataGroupObject = GetCacheDataGroup(dirtyDataGroup);
+                saveList.Add(dataGroupObject.SaveAsync());
+            }
+            await Task.WhenAll(saveList);
+            allComplete?.Invoke();
             dirtyDataGroupList.Clear();
         }
         

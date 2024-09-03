@@ -84,10 +84,18 @@ namespace FlexiArchiveSystem.Sample
 			return dataVector2.DiskData.ToString();
 		}
 
-		private void Demo7_SavePoint()
+		private void Demo7_SavePoint(bool isAsync)
 		{
 			Debug.Log(string.Format($"save archive"));
-			archiveManager.Save();
+			if (isAsync)
+			{
+				archiveManager.SaveAsync(() => { Debug.Log("async save successfully");});
+			}
+			else
+			{
+				archiveManager.Save();
+				Debug.Log("save successfully");
+			}
 		}
 
 		private void Demo_DeleteCurrentArchive()

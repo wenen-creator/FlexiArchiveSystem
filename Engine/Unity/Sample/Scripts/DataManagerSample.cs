@@ -18,10 +18,5 @@ namespace FlexiArchiveSystem.Sample
             return new ArchiveSettingWrapper("DataArchiveSettingByGameplay",
                 Resources.Load<FlexiArchiveSetting>("DataArchiveSettingByGameplay"));
         }
-
-        static DataManagerSample()
-        {
-            Debug.Log("test");
-        }
     }
 }

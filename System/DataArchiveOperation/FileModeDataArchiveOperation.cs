@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using LitJson;
 
@@ -69,32 +70,58 @@ namespace FlexiArchiveSystem.ArchiveOperation
             _archiveID = archiveID;
         }
 
-        public void DataPersistent(string key, string dataStr)
+        private bool DataPersistentReadyWork(string groupKey,string dataKey, string dataStr)
         {
-            var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(key);
-            string groupKey = keyTuple.Item1;
-            string dataKey = keyTuple.Item2;
             if (Directory.Exists(Path) == false)
             {
                 Directory.CreateDirectory(Path);
             }
 
             bool hasExistedBefore = TryGetJsonData(groupKey, out JsonData jsonData);
-            bool isRewriteGroupKeys = hasExistedBefore == false;
+            
             if (hasExistedBefore == false)
             {
                 jsonData = new JsonData();
                 groupDataMap.Add(groupKey, jsonData);
             }
-
+            
             jsonData[dataKey] = JsonMapper.ToObject(dataStr);
+            return hasExistedBefore;
+        }
+        
+        public void DataPersistent(string key, string dataStr)
+        {
+            var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(key);
+            string groupKey = keyTuple.Item1;
+            string dataKey = keyTuple.Item2;
+            bool hasExistedBefore = DataPersistentReadyWork(groupKey, dataKey, dataStr);
             string groupFilePath = GetAndCombineDataFilePath(groupKey);
-            File.WriteAllText(groupFilePath, jsonData.ToJson());
+            File.WriteAllText(groupFilePath, groupDataMap[groupKey].ToJson());
+            bool isRewriteGroupKeys = hasExistedBefore == false;
             if (isRewriteGroupKeys)
             {
                 TryRecordKey(groupKey, dataKey);
             }
         }
+
+        public async Task DataPersistentAsync(string key, string dataStr, Action complete)
+        {
+            var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(key);
+            string groupKey = keyTuple.Item1;
+            string dataKey = keyTuple.Item2;
+            bool hasExistedBefore = DataPersistentReadyWork(groupKey, dataKey, dataStr);
+            string groupFilePath = GetAndCombineDataFilePath(groupKey);
+
+            await File.WriteAllTextAsync(groupFilePath, groupDataMap[groupKey].ToJson());
+            
+            bool isRewriteGroupKeys = hasExistedBefore == false;
+            if (isRewriteGroupKeys)
+            {
+                TryRecordKey(groupKey, dataKey);
+            }
+            complete?.Invoke();
+        }
+
 
         public virtual void TryRecordKey(string groupKey, string dataKey)
         {

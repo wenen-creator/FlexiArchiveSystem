@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using FlexiArchiveSystem.Assist;
 
 namespace FlexiArchiveSystem
@@ -92,6 +93,27 @@ namespace FlexiArchiveSystem
                 dataObject.Save();
             }
 
+            if (dirtyDataObjectList.Count > 0 && _ArchiveSetting.IsLog)
+            {
+                Logger.LOG($"数据存档更新[{dirtyDataObjectList.Count}]条");
+            }
+
+            dirtyDataObjectList.Clear();
+        }
+        
+        public async Task SaveAsync(Action complete = null)
+        {
+            //TODO : cancel token
+            IList<Task> saveList = new List<Task>();
+            foreach (var dirtyDataObject in dirtyDataObjectList)
+            {
+                DataObject dataObject = GetCacheDataObject(dirtyDataObject);
+                saveList.Add(dataObject.SaveAsync());
+            }
+
+            await Task.WhenAll(saveList);
+            complete?.Invoke();
+           
             if (dirtyDataObjectList.Count > 0 && _ArchiveSetting.IsLog)
             {
                 Logger.LOG($"数据存档更新[{dirtyDataObjectList.Count}]条");
