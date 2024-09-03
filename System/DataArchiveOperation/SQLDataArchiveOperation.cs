@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Mono.Data.Sqlite;
 
@@ -329,14 +330,14 @@ namespace FlexiArchiveSystem.ArchiveOperation
             ArchiveOperationHelper.DeleteAllGroupKeyFromDisk();
         }
 
-        public IDataArchiveSourceWrapper GetSource()
+        public async Task<IDataArchiveSourceWrapper> GetSource()
         {
             SqliteArchiveSourceWrapper wrapper = new SqliteArchiveSourceWrapper();
             wrapper.sourcePath = FilePath;
             return wrapper;
         }
 
-        public void CloneTo(IDataArchiveSourceWrapper source)
+        public async Task CloneTo(IDataArchiveSourceWrapper source)
         {
             var wrapper = source as SqliteArchiveSourceWrapper;
 
@@ -350,7 +351,27 @@ namespace FlexiArchiveSystem.ArchiveOperation
                 Directory.CreateDirectory(Path);
             }
 
-            File.Copy(wrapper.sourcePath, FilePath);
+            StringBuilder sb = new StringBuilder();
+            byte[] buffer = new byte[0x1000];
+            int readLen;
+            using (var reader = new FileStream(
+                       wrapper.sourcePath,
+                       FileMode.Open, FileAccess.Read, FileShare.Read,
+                       bufferSize: 4096, useAsync: true))
+            {
+                using (var writer = new FileStream(
+                           FilePath,
+                           FileMode.OpenOrCreate, FileAccess.Write, FileShare.Write,
+                           bufferSize: 4096, useAsync: true))
+                {
+                    while ((readLen = await reader.ReadAsync(buffer, 0,buffer.Length)) != 0)
+                    {
+                        await writer.WriteAsync(buffer,0,buffer.Length);
+                    }
+                }
+                
+            }
+
         }
 
         public void Dispose()
@@ -359,7 +380,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
             {
                 try
                 {
-                    // connection.Dispose();
+                    connection.Dispose();
                     SqliteConnection.ClearPool(connection);
                 }
                 catch (Exception)

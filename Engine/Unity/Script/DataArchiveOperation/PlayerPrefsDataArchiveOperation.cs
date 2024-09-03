@@ -54,10 +54,10 @@ namespace FlexiArchiveSystem.ArchiveOperation
 
         private int _archiveID;
 
-        public void Init(int archiveID)
+        public async void Init(int archiveID)
         {
             SetArchiveID(archiveID);
-            AllGroupKeys = LoadAllGroupKeyFromDisk();
+            AllGroupKeys = await LoadAllGroupKeyFromDisk();
             IsActive = true;
         }
 
@@ -84,7 +84,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
 
         public async Task DataPersistentAsync(string key, string dataStr, Action complete)
         {
-            throw new NotImplementedException("PlayerPrefs does not support async saving");
+            throw new NotImplementedException("PlayerPrefs不支持异步保存");
         }
 
         public string Read(string key)
@@ -122,7 +122,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
         {
             if (AllGroupKeys == null)
             {
-                AllGroupKeys = LoadAllGroupKeyFromDisk();
+                AllGroupKeys = await LoadAllGroupKeyFromDisk();
             }
 
             if (AllGroupKeys != null)
@@ -176,9 +176,9 @@ namespace FlexiArchiveSystem.ArchiveOperation
             ArchiveOperationHelper.DeleteAllGroupKeyFromDisk();
         }
 
-        private List<string> LoadAllGroupKeyFromDisk()
+        private async Task<List<string>> LoadAllGroupKeyFromDisk()
         {
-            return ArchiveOperationHelper.GetAllGroupKey();
+            return await ArchiveOperationHelper.GetAllGroupKey();
         }
 
         private bool TryGetJsonData(string groupKey, out JsonData jsonData)

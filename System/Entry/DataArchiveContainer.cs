@@ -137,7 +137,7 @@ namespace FlexiArchiveSystem.Entry
             ClearMemoryCache();
         }
 
-        public void InstantiateNewArchive()
+        public async void InstantiateNewArchive(Action complete = null)
         {
             int nextArchiveID = _dataArchiveSetting.GetNextArchiveID();
             //Clone
@@ -152,17 +152,21 @@ namespace FlexiArchiveSystem.Entry
             IDataArchiveOperation newDataArchiveOperation = null;
             if (currentDataArchiveOperation is ICloneDataArchive iCloneDataArchive)
             {
-                var source = iCloneDataArchive.GetSource();
+                var source = await iCloneDataArchive.GetSource();
                 var targetArchiveOperation = DataArchiveOperationFactory.CreateArchiveOperationObject(
                     _dataArchiveSetting.ArchiveOperationMode,
                     nextArchiveID);
                 targetArchiveOperation.Init(nextArchiveID);
                 ICloneDataArchive target = targetArchiveOperation as ICloneDataArchive;
-                targetArchiveOperation.SetDataArchiveOperationHelper(currentDataArchiveOperation
-                    .ArchiveOperationHelper);
-                target.CloneTo(source);
-                newDataArchiveOperation = target as IDataArchiveOperation;
-                CreateNewSystemInfoCoupleWithArchive(nextArchiveID);
+                if (target != null)
+                {
+                    targetArchiveOperation.SetDataArchiveOperationHelper(currentDataArchiveOperation
+                        .ArchiveOperationHelper);
+                    currentDataArchiveOperation.Dispose();
+                    await target.CloneTo(source);
+                    newDataArchiveOperation = target as IDataArchiveOperation;
+                    CreateNewSystemInfoCoupleWithArchive(nextArchiveID);
+                }
             }
             else
             {
@@ -170,22 +174,22 @@ namespace FlexiArchiveSystem.Entry
             }
 
             _dataArchiveSetting.DataArchiveOperation = newDataArchiveOperation;
-            currentDataArchiveOperation.Dispose();
             _dataArchiveSetting.SetArchiveID(nextArchiveID);
             if (_dataArchiveSetting.IsLog) Logger.LOG("克隆存档成功");
+            complete?.Invoke();
         }
 
         [Conditional("UNITY_EDITOR")]
-        private void CreateNewSystemInfoCoupleWithArchive(int nextArchiveID)
+        private async void CreateNewSystemInfoCoupleWithArchive(int nextArchiveID)
         {
             var currentSystemInfoOperation = _dataArchiveSetting.DataTypeSystemInfoOperation;
-            var source = currentSystemInfoOperation.GetSource();
+            var source = await currentSystemInfoOperation.GetSource();
             var newSystemInfo = DataArchiveOperationFactory.CreateArchiveSystemInfoOperationObject(
                 _dataArchiveSetting.ArchiveOperationMode,
                 nextArchiveID);
             newSystemInfo.Init(nextArchiveID);
             newSystemInfo.SetDataArchiveOperationHelper(currentSystemInfoOperation.ArchiveOperationHelper);
-            newSystemInfo.CloneTo(source);
+            await newSystemInfo.CloneTo(source);
             _dataArchiveSetting.DataTypeSystemInfoOperation = newSystemInfo;
         }
 

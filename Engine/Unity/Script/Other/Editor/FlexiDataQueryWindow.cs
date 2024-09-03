@@ -271,7 +271,7 @@ namespace FlexiArchiveSystem.U3DEditor
 
                     EditorGUILayout.LabelField(new GUIContent("Type: "), GUILayout.Width(40));
                     EditorGUILayout.LabelField(pair.Value.resultType, GUI.skin.box,
-                        GUILayout.Width(CalculateTypeDesWidth(pair.Value.resultType)), GUILayout.Height(22));
+                        GUILayout.Width(position.width * 0.1f), GUILayout.Height(22));
                     EditorGUILayout.Space(1);
                     if (GUILayout.Button("Detail", GUILayout.ExpandWidth(true)))
                     {
@@ -398,11 +398,6 @@ namespace FlexiArchiveSystem.U3DEditor
             DataObject dataObject = DataArchiveManager.GetDataObject(keyCollection.Item1, keyCollection.Item2);
             RemoveMonitor(dataObject);
             removeResultQueue.Enqueue(key);
-        }
-
-        private float CalculateTypeDesWidth(string des)
-        {
-            return des.Length * 8;
         }
 
         private void SelectArchiveIDItem(int index)

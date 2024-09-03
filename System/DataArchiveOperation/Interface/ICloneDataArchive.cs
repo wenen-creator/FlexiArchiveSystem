@@ -5,11 +5,13 @@
 //        email: yixiangluntan@163.com
 //-------------------------------------------------
 
+using System.Threading.Tasks;
+
 namespace FlexiArchiveSystem.ArchiveOperation
 {
     public interface ICloneDataArchive
     {
-        public IDataArchiveSourceWrapper GetSource();
-        public void CloneTo(IDataArchiveSourceWrapper source);
+        public Task<IDataArchiveSourceWrapper> GetSource();
+        public Task CloneTo(IDataArchiveSourceWrapper source);
     }
 }

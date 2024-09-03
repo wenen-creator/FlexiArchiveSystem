@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using LitJson;
 
@@ -112,7 +111,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
             bool hasExistedBefore = DataPersistentReadyWork(groupKey, dataKey, dataStr);
             string groupFilePath = GetAndCombineDataFilePath(groupKey);
 
-            await File.WriteAllTextAsync(groupFilePath, groupDataMap[groupKey].ToJson());
+            await WriteToDiskAsync(groupFilePath, groupDataMap[groupKey].ToJson());
             
             bool isRewriteGroupKeys = hasExistedBefore == false;
             if (isRewriteGroupKeys)
@@ -120,6 +119,16 @@ namespace FlexiArchiveSystem.ArchiveOperation
                 TryRecordKey(groupKey, dataKey);
             }
             complete?.Invoke();
+        }
+
+        private async Task WriteToDiskAsync(string filePath, string text)
+        {
+            using (var sourceStream = new StreamWriter(filePath))
+            {
+                sourceStream.AutoFlush = false;
+                await sourceStream.WriteAsync(text);
+                await sourceStream.FlushAsync();
+            }
         }
 
 
@@ -224,6 +233,24 @@ namespace FlexiArchiveSystem.ArchiveOperation
 
             return true;
         }
+        
+        private async Task<(bool,JsonData)> TryGetJsonDataAsync(string groupKey)
+        {
+            JsonData jsonData = null;
+            if (groupDataMap.TryGetValue(groupKey, out jsonData) == false)
+            {
+                string str = await LoadFromDiskAsync(groupKey);
+                if (string.IsNullOrEmpty(str))
+                {
+                    return (false, null);
+                }
+
+                jsonData = JsonMapper.ToObject(str);
+                groupDataMap.Add(groupKey, jsonData);
+            }
+
+            return (true, jsonData);
+        }
 
         private string LoadFromDisk(string groupKey)
         {
@@ -236,10 +263,30 @@ namespace FlexiArchiveSystem.ArchiveOperation
             string str = File.ReadAllText(filePath, Encoding.UTF8);
             return str;
         }
-
-        private List<string> LoadAllGroupKeyFromDisk()
+        
+        private async Task<string> LoadFromDiskAsync(string groupKey)
         {
-            return ArchiveOperationHelper.GetAllGroupKey();
+            string filePath = GetAndCombineDataFilePath(groupKey);
+            if (File.Exists(filePath) == false)
+            {
+                return "";
+            }
+            var sb = new StringBuilder();
+            using (var sourceStream = new StreamReader(filePath))
+            {
+                char[] buffer = new char[50];
+                int readLen;
+                while ((readLen = await sourceStream.ReadAsync(buffer, 0,buffer.Length)) != 0)
+                {
+                    sb.Append(buffer, 0, readLen);
+                }
+            }
+            return sb.ToString();
+        }
+
+        private async Task<List<string>> LoadAllGroupKeyFromDisk()
+        {
+            return await ArchiveOperationHelper.GetAllGroupKey();
         }
 
         private string GetAndCombineDataFilePath(string groupKey)
@@ -255,21 +302,22 @@ namespace FlexiArchiveSystem.ArchiveOperation
             return JsonMapper.ToObject<Dictionary<string, JsonData>>(jsonData.ToJson());
         }
 
-        public IDataArchiveSourceWrapper GetSource()
+        public async Task<IDataArchiveSourceWrapper> GetSource()
         {
             if (AllGroupKeys == null)
             {
-                AllGroupKeys = LoadAllGroupKeyFromDisk();
+                AllGroupKeys = await LoadAllGroupKeyFromDisk();
             }
 
             var sourceWrapper = new DictionaryJsonArchiveSourceWrapper();
             if (AllGroupKeys != null)
             {
+                List<Task> readTasks = new List<Task>();
                 foreach (var groupKey in AllGroupKeys)
                 {
-                    TryGetJsonData(groupKey, out JsonData jsonData);
+                    readTasks.Add(TryGetJsonDataAsync(groupKey));
                 }
-
+                await Task.WhenAll(readTasks);
                 sourceWrapper.source = groupDataMap;
             }
             else
@@ -280,7 +328,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
             return sourceWrapper;
         }
 
-        public void CloneTo(IDataArchiveSourceWrapper source)
+        public async Task CloneTo(IDataArchiveSourceWrapper source)
         {
             if (source is DictionaryJsonArchiveSourceWrapper == false)
             {
@@ -298,14 +346,15 @@ namespace FlexiArchiveSystem.ArchiveOperation
             {
                 Directory.CreateDirectory(Path);
             }
-
+            List<Task> writeTasks = new List<Task>();
             foreach (var pair in groupDataMap)
             {
                 string groupKey = pair.Key;
                 string filePath = GetAndCombineDataFilePath(groupKey);
-                File.WriteAllText(filePath, pair.Value.ToJson());
+                writeTasks.Add(WriteToDiskAsync(filePath, pair.Value.ToJson()));
             }
 
+            await Task.WhenAll(writeTasks);
             ArchiveOperationHelper.RecordAllGroupKey(_archiveID, groupDataMap.Keys.ToList());
         }
 

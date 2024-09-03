@@ -8,6 +8,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 using LitJson;
 
 namespace FlexiArchiveSystem.ArchiveOperation
@@ -24,16 +26,14 @@ namespace FlexiArchiveSystem.ArchiveOperation
         {
             _archiveID = archiveID;
         }
-
-        [Conditional("UNITY_EDITOR")]
+        
         public void RecordKey(int archiveID, string groupKey, string dataKey)
         {
             UpdateDirtyState(archiveID);
             //记录key
             TryAddGroupKey(groupKey);
         }
-
-        [Conditional("UNITY_EDITOR")]
+        
         public void RecordAllGroupKey(int archiveID, List<string> groupKeys)
         {
             UpdateDirtyState(archiveID);
@@ -44,7 +44,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
         }
 
 
-        public void UpdateDirtyState(int archiveID)
+        private void UpdateDirtyState(int archiveID)
         {
             if (archiveID != _archiveID)
             {
@@ -53,9 +53,9 @@ namespace FlexiArchiveSystem.ArchiveOperation
             }
         }
 
-        public void TryAddGroupKey(string groupKey)
+        private async void TryAddGroupKey(string groupKey)
         {
-            var groupKeys = GetAllGroupKey();
+            var groupKeys = await GetAllGroupKey();
             if (groupKeys == null)
             {
                 groupKeys = new List<string>();
@@ -75,14 +75,14 @@ namespace FlexiArchiveSystem.ArchiveOperation
             WriteToDisk(groupKeysJsonData);
         }
 
-        public List<string> GetAllGroupKey()
+        public async Task<List<string>> GetAllGroupKey()
         {
             if (GroupKeysJsonDataIsDirty == false)
             {
                 return GroupKeys;
             }
 
-            JsonData groupKeysJson = TryGetLoadGroupKeysJsonData();
+            JsonData groupKeysJson = await TryGetLoadGroupKeysJsonData();
             if (groupKeysJson == null)
             {
                 return null;
@@ -108,7 +108,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
             File.WriteAllText(DataArchiveConstData.GetArchiveGroupKeysFilePath(_archiveID), jsonData.ToJson());
         }
 
-        private JsonData TryGetLoadGroupKeysJsonData()
+        private async Task<JsonData> TryGetLoadGroupKeysJsonData()
         {
             if (GroupKeysJsonDataIsDirty == false)
             {
@@ -116,19 +116,28 @@ namespace FlexiArchiveSystem.ArchiveOperation
             }
 
             string saveGroupPath = DataArchiveConstData.GetArchiveGroupKeysFilePath(_archiveID);
-            groupKeysJsonData = JsonMapper.ToObject(LoadGroupKeysFromDisk(saveGroupPath));
+            
+            groupKeysJsonData = JsonMapper.ToObject(await LoadGroupKeysFromDisk(saveGroupPath));
             return groupKeysJsonData;
         }
 
-        private string LoadGroupKeysFromDisk(string path)
+        private async Task<string> LoadGroupKeysFromDisk(string path)
         {
             if (File.Exists(path) == false)
             {
                 return "";
             }
-
-            string str = File.ReadAllText(path);
-            return str;
+            var sb = new StringBuilder();
+            using (var sourceStream = new StreamReader(path))
+            {
+                char[] buffer = new char[50];
+                int readLen;
+                while ((readLen = await sourceStream.ReadAsync(buffer, 0,buffer.Length)) != 0)
+                {
+                    sb.Append(buffer, 0, readLen);
+                }
+            }
+            return sb.ToString();
         }
 
         public void DeleteAllGroupKeyFromDisk()
@@ -143,9 +152,9 @@ namespace FlexiArchiveSystem.ArchiveOperation
             groupKeysJsonData = null;
         }
 
-        public void RemoveGroupKey(string groupKey)
+        public async void RemoveGroupKey(string groupKey)
         {
-            var groupKeys = GetAllGroupKey();
+            var groupKeys = await GetAllGroupKey();
             groupKeys.Remove(groupKey);
             groupKeysJsonData = ConvertToJsonData(groupKeys);
             WriteToDisk(groupKeysJsonData);
