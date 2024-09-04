@@ -84,16 +84,20 @@ namespace FlexiArchiveSystem.ArchiveOperation
             throw new NotImplementedException();
         }
 
+#pragma warning disable CS1998
         public async Task DataPersistentAsync(string groupKey, string dataKey, string dataStr, Action complete)
         {
             throw new NotImplementedException("PlayerPrefs does not support asynchronous saving");
         }
-
+#pragma warning restore CS1998
+        
+#pragma warning disable CS1998
         public async Task DataPersistentAsync(Action complete, params DataObject[] dataObjects)
         {
             throw new NotImplementedException("PlayerPrefs does not support asynchronous saving");
         }
-
+#pragma warning restore CS1998
+        
         public string Read(string groupKey, string dataKey)
         {
             bool isGet = TryGetJsonData(groupKey, out JsonData jsonData);
@@ -139,7 +143,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
             TryRemoveAllGroupKey();
         }
 #pragma warning restore CS1998
-
+        
         public void Delete(string groupKey, string dataKey)
         {
             bool isGet = TryGetJsonData(groupKey, out JsonData jsonData);

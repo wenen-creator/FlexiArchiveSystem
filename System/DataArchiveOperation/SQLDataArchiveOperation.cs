@@ -348,13 +348,15 @@ namespace FlexiArchiveSystem.ArchiveOperation
             ArchiveOperationHelper.DeleteAllGroupKeyFromDisk();
         }
 
+#pragma warning disable CS1998
         public async Task<IDataArchiveSourceWrapper> GetSource()
         {
             SqliteArchiveSourceWrapper wrapper = new SqliteArchiveSourceWrapper();
             wrapper.sourcePath = FilePath;
             return wrapper;
         }
-
+#pragma warning restore CS1998
+        
         public async Task CloneTo(IDataArchiveSourceWrapper source)
         {
             var wrapper = source as SqliteArchiveSourceWrapper;

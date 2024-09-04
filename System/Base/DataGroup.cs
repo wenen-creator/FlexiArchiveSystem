@@ -99,6 +99,7 @@ namespace FlexiArchiveSystem
             foreach (var dirtyDataObject in dirtyDataObjectList)
             {
                 dirtyDataObject._dataType.Refresh();
+                dirtyDataObject.TryToSaveDataSystemInfo();
                 dirtyDataObject.CleanDirty();
             }
             
@@ -124,6 +125,7 @@ namespace FlexiArchiveSystem
             foreach (var dirtyDataObject in dirtyDataObjectList)
             {
                 dirtyDataObject._dataType.Refresh();
+                dirtyDataObject.TryToSaveDataSystemInfo();
                 dirtyDataObject.CleanDirty();
             }
             

@@ -134,6 +134,7 @@ namespace FlexiArchiveSystem
 
         private List<int> GetAllArchiveIDFromDisk()
         {
+            List<int> allArchiveID = null;
             switch (archiveOperationType)
             {
                 case ArchiveOperationType.FileMode:
@@ -145,7 +146,6 @@ namespace FlexiArchiveSystem
                     }
 
                     string[] infos = Directory.GetDirectories(archiveRootDirectoryPath);
-                    List<int> allArchiveID = null;
                     if (infos != null && infos.Length > 0)
                     {
                         allArchiveID = new List<int>(infos.Length);
@@ -163,11 +163,18 @@ namespace FlexiArchiveSystem
                         allArchiveID = new List<int>(1);
                         allArchiveID[0] = DataArchiveConstData.DefaultStartArchiveID;
                     }
-
-                    return allArchiveID;
+                    break;
                 default:
                     throw new Exception("ERROR：当前使用的存档方式，不支持多存档共存机制");
             }
+
+            if (allArchiveID != null && allArchiveID.Count > 1)
+            {
+                //sort
+                allArchiveID.Sort();
+            }
+
+            return allArchiveID;
         }
     }
 }

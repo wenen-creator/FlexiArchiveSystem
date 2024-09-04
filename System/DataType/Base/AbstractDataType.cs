@@ -22,10 +22,7 @@ namespace FlexiArchiveSystem
         private T diskData;
         public T DiskData => diskData;
         public event Action OnDirtyHandler;
-        public event Action<string, DataTypeSystemInfo> OnPersistentHandler;
-
         private DataTypeSystemInfo _systemInfo;
-        
         DataTypeSystemInfo IDataType.SystemInfo
         {
             get => _systemInfo;

@@ -183,7 +183,7 @@ namespace FlexiArchiveSystem.U3DEditor
             {
                 EditorGUILayout.Space(1, false);
                 GUILayout.Label("选择存档:", GUILayout.Width(60));
-                EditorGUI.BeginDisabledGroup(Application.isPlaying);
+                EditorGUI.BeginDisabledGroup(Application.isPlaying || DataArchiveSetting == null);
                 if (EditorGUILayout.DropdownButton(new GUIContent(DataArchiveConstData.GetArchiveKey(selectArchiveID)),
                         FocusType.Keyboard,
                         GUILayout.Width(position.width * 0.4f)))
@@ -327,6 +327,10 @@ namespace FlexiArchiveSystem.U3DEditor
             string groupKey = keyTuple.Item1;
             string dataKey = keyTuple.Item2;
             Type dataTypeSystemType = DataArchiveSetting.DataTypeSystemInfoOperation.GetTypeOfDataValue(groupKey, dataKey);
+            if (dataTypeSystemType == null)
+            {
+                Debug.LogError("SystemInfo信息缺失");
+            }
             Type valueType = dataTypeSystemType.BaseType.GetGenericArguments()[0];
             var methodInfo_GetData = dataObject.GetType().GetMethod("GetData");
             methodInfo_GetData = methodInfo_GetData.MakeGenericMethod(dataTypeSystemType);

@@ -26,16 +26,32 @@ namespace FlexiArchiveSystem.ArchiveOperation
             string jsonStr = dataTypeSystemInfo.Serialize();
             DataPersistent(groupKey, dataKey, jsonStr);
         }
+        
+        public async void ToAsyncSaveDataTypeSystemInfo(string groupKey, string dataKey, DataTypeSystemInfo dataTypeSystemInfo)
+        {
+            string jsonStr = dataTypeSystemInfo.Serialize();
+            await DataPersistentAsync(groupKey, dataKey, jsonStr, null);
+        }
 
-        public DataTypeSystemInfo ReadSystemInfo(string groupKey, string dataKey)
+        public bool ReadSystemInfo(string groupKey, string dataKey, out DataTypeSystemInfo systemInfo)
         {
             string jsonStr = Read(groupKey, dataKey);
-            return JsonMapper.ToObject<DataTypeSystemInfo>(jsonStr);
+            if (string.IsNullOrEmpty(jsonStr))
+            {
+                systemInfo = default(DataTypeSystemInfo);
+                return false;
+            }
+            systemInfo = JsonMapper.ToObject<DataTypeSystemInfo>(jsonStr);
+            return true;
         }
 
         public Type GetTypeOfDataValue(string groupKey, string dataKey)
         {
-            DataTypeSystemInfo dataTypeSystemInfo = ReadSystemInfo(groupKey, dataKey);
+            bool success = ReadSystemInfo(groupKey, dataKey,out DataTypeSystemInfo dataTypeSystemInfo);
+            if (success == false)
+            {
+                return null;
+            }
             return Type.GetType(dataTypeSystemInfo.systemType);
         }
 

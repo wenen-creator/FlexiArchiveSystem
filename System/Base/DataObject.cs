@@ -79,7 +79,6 @@ namespace FlexiArchiveSystem
          var concreteDataType = ConvertTo<T>(_data);
          _dataType = concreteDataType;
          concreteDataType.OnDirtyHandler += SetDirty;
-         concreteDataType.OnPersistentHandler += OnDataPersistent;
          concreteDataType.InjectArchiveOperationType(_ArchiveSetting.ArchiveOperationMode);
          return concreteDataType;
       }
@@ -134,14 +133,21 @@ namespace FlexiArchiveSystem
       private void TryToSaveDataSystemInfo(string groupKey, string dataKey, DataTypeSystemInfo dataTypeSystemInfo)
       {
 #if UNITY_EDITOR
-         _ArchiveSetting.DataTypeSystemInfoOperation.ToSaveDataTypeSystemInfo(groupKey, dataKey, dataTypeSystemInfo);
+         _ArchiveSetting.DataTypeSystemInfoOperation.ToAsyncSaveDataTypeSystemInfo(groupKey, dataKey, dataTypeSystemInfo);
 #else
          if (_ArchiveSetting.IsAllowSaveDataSystemInfoInPlayerDevice)
          {
-            _ArchiveSetting.DataTypeSystemInfoOperation.ToSaveDataTypeSystemInfo(groupKey, dataKey, dataTypeSystemInfo);
+            _ArchiveSetting.DataTypeSystemInfoOperation.ToAsyncSaveDataTypeSystemInfo(groupKey, dataKey, dataTypeSystemInfo);
          }
 #endif
+      }
 
+      public void TryToSaveDataSystemInfo()
+      {
+         var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(_Key);
+         string groupKey = keyTuple.Item1;
+         string dataKey = keyTuple.Item2;
+         TryToSaveDataSystemInfo(groupKey, dataKey, _dataType.SystemInfo);
       }
 
       public void Save()

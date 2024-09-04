@@ -13,7 +13,7 @@ namespace FlexiArchiveSystem
     {
         public string SystemInfoPath { get; set; }
         public void ToSaveDataTypeSystemInfo(string groupKey, string dataKey, DataTypeSystemInfo dataTypeSystemInfo);
-        public DataTypeSystemInfo ReadSystemInfo(string groupKey, string dataKey);
+        public bool ReadSystemInfo(string groupKey, string dataKey, out DataTypeSystemInfo systemInfo);
         public Type GetTypeOfDataValue(string groupKey, string dataKey);
     }
 }
