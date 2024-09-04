@@ -27,6 +27,11 @@ namespace FlexiArchiveSystem
 
         [SerializeField] private bool isLog = true;
         public bool IsLog => isLog;
+        
+        [Header("是否要在玩家设备上存储数据的类型信息")]
+        [Tooltip("通常是不需要的。在玩家设备上关闭该选项不会影响数据的存档。该信息只是对应数据的辅助信息，仅为了辅助开发环境的检视。")]
+        [SerializeField] private bool _AllowSaveDataSystemInfo = false;
+        public bool IsAllowSaveDataSystemInfoInPlayerDevice => _AllowSaveDataSystemInfo;
 
         public int CurrentArchiveID { get; private set; }
         public List<int> AllArchiveID { get; private set; }

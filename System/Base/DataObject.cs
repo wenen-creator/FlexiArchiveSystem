@@ -31,6 +31,8 @@ namespace FlexiArchiveSystem
       
       private Task aysncSaveTask;
 
+      private string serializeData;
+
       public string Key
       {
          get => _Key;
@@ -51,10 +53,13 @@ namespace FlexiArchiveSystem
 
       private string LoadFromDiskTo()
       {
-         return ArchiveOperation.Read(_Key);
+         var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(_Key);
+         string groupKey = keyTuple.Item1;
+         string dataKey = keyTuple.Item2;
+         return ArchiveOperation.Read(groupKey, dataKey);
       }
 
-      public void InjectArchiveSetting(IArchiveSetting setting)
+      internal void InjectArchiveSetting(IArchiveSetting setting)
       {
          _ArchiveSetting = setting;
       }
@@ -90,26 +95,35 @@ namespace FlexiArchiveSystem
          OnDirtyHandler?.Invoke(_Key);
          isDirty = true;
       }
+      
+      public void CleanDirty()
+      {
+         isDirty = false;
+      }
 
       private void OnDataPersistent(string dataStr, DataTypeSystemInfo dataTypeSystemInfo)
       {
          isDirty = false;
          
+         var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(_Key);
+         string groupKey = keyTuple.Item1;
+         string dataKey = keyTuple.Item2;
+         
          if (isAsyncSave)
          {
             var temp = aysncSaveComplete;
-            aysncSaveTask = ArchiveOperation.DataPersistentAsync(_Key, dataStr, () =>
+            aysncSaveTask = ArchiveOperation.DataPersistentAsync(groupKey, dataKey, dataStr, () =>
             {
                temp?.Invoke();
-               _ArchiveSetting.DataTypeSystemInfoOperation.ToSaveDataTypeSystemInfo(_Key, dataTypeSystemInfo);
+               TryToSaveDataSystemInfo(groupKey, dataKey, dataTypeSystemInfo);
                //TODO : 立刻执行还是等待任务完成
                OnPersistentHandler?.Invoke(_Key);
             });
          }
          else
          {
-            ArchiveOperation.DataPersistent(_Key, dataStr);
-            _ArchiveSetting.DataTypeSystemInfoOperation.ToSaveDataTypeSystemInfo(_Key, dataTypeSystemInfo);
+            ArchiveOperation.DataPersistent(groupKey, dataKey, dataStr);
+            TryToSaveDataSystemInfo(groupKey, dataKey, dataTypeSystemInfo);
             OnPersistentHandler?.Invoke(_Key);
          }
          
@@ -117,12 +131,26 @@ namespace FlexiArchiveSystem
          aysncSaveComplete = null;
       }
 
+      private void TryToSaveDataSystemInfo(string groupKey, string dataKey, DataTypeSystemInfo dataTypeSystemInfo)
+      {
+#if UNITY_EDITOR
+         _ArchiveSetting.DataTypeSystemInfoOperation.ToSaveDataTypeSystemInfo(groupKey, dataKey, dataTypeSystemInfo);
+#else
+         if (_ArchiveSetting.IsAllowSaveDataSystemInfoInPlayerDevice)
+         {
+            _ArchiveSetting.DataTypeSystemInfoOperation.ToSaveDataTypeSystemInfo(groupKey, dataKey, dataTypeSystemInfo);
+         }
+#endif
+
+      }
+
       public void Save()
       {
          if (isDirty)
          {
             isAsyncSave = false;
-            _dataType.ToPersistent();
+            OnDataPersistent(GetSerializeData(), _dataType.SystemInfo);
+            _dataType.Refresh();
          }
       }
       
@@ -132,18 +160,31 @@ namespace FlexiArchiveSystem
          {
             isAsyncSave = true;
             aysncSaveComplete = complete;
-            _dataType.ToPersistent();
+            OnDataPersistent(GetSerializeData(), _dataType.SystemInfo);
             if (aysncSaveTask != null)
             {
                await aysncSaveTask;
             }
+            _dataType.Refresh();
          }
+      }
+
+      internal string GetSerializeData()
+      {
+         if (isDirty)
+         {
+            serializeData = _dataType.Serialize();
+         }
+         return serializeData;
       }
 
       public void Delete()
       {
-         ArchiveOperation.Delete(_Key);
-         _ArchiveSetting.DataTypeSystemInfoOperation.Delete(_Key);
+         var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(_Key);
+         string groupKey = keyTuple.Item1;
+         string dataKey = keyTuple.Item2;
+         ArchiveOperation.Delete(groupKey, dataKey);
+         _ArchiveSetting.DataTypeSystemInfoOperation.Delete(groupKey, dataKey);
          _dataType.Reset();
       }
 

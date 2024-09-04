@@ -6,6 +6,7 @@
 //-------------------------------------------------
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
@@ -15,7 +16,7 @@ using Mono.Data.Sqlite;
 
 namespace FlexiArchiveSystem.ArchiveOperation
 {
-    public class SQLDataArchiveOperation : IDataArchiveOperation, ISetDataArchivePath, ICloneDataArchive
+    internal class SQLDataArchiveOperation : IDataArchiveOperation, ISetDataArchivePath, ICloneDataArchive
     {
         public bool IsValidation
         {
@@ -97,16 +98,13 @@ namespace FlexiArchiveSystem.ArchiveOperation
             connection.Open();
         }
 
-        public void DataPersistent(string key, string dataStr)
+        public void DataPersistent(string groupKey, string dataKey, string dataStr)
         {
             if (connection == null)
             {
                 InitDBConnection();
             }
-
-            var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(key);
-            string groupKey = keyTuple.Item1;
-            string dataKey = keyTuple.Item2;
+            
 
             string queryGroupTableCmd = $"select name from sqlite_master where type='table' and name='{groupKey}'";
             SqliteCommand groupCommand = new SqliteCommand(queryGroupTableCmd, connection);
@@ -141,16 +139,23 @@ namespace FlexiArchiveSystem.ArchiveOperation
             }
         }
 
-        public async Task DataPersistentAsync(string key, string dataStr, Action complete)
+        public void DataPersistent(params DataObject[] dataObjects)
+        {
+            foreach (var dataObject in dataObjects)
+            {
+                var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(dataObject.Key);
+                string groupKey = keyTuple.Item1;
+                string dataKey = keyTuple.Item2;
+                DataPersistent(groupKey, dataKey, dataObject.GetSerializeData());
+            }
+        }
+
+        public async Task DataPersistentAsync(string groupKey, string dataKey, string dataStr, Action complete)
         {
             if (connection == null)
             {
                 InitDBConnection();
             }
-            
-            var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(key);
-            string groupKey = keyTuple.Item1;
-            string dataKey = keyTuple.Item2;
 
             string queryGroupTableCmd = $"select name from sqlite_master where type='table' and name='{groupKey}'";
             SqliteCommand groupCommand = new SqliteCommand(queryGroupTableCmd, connection);
@@ -188,7 +193,22 @@ namespace FlexiArchiveSystem.ArchiveOperation
             complete?.Invoke();
         }
 
-        public string Read(string key)
+        public async Task DataPersistentAsync(Action complete, params DataObject[] dataObjects)
+        {
+            IList<Task> writeTasks = new List<Task>();
+            foreach (var dataObject in dataObjects)
+            {
+                var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(dataObject.Key);
+                string groupKey = keyTuple.Item1;
+                string dataKey = keyTuple.Item2;
+                writeTasks.Add( DataPersistentAsync(groupKey, dataKey, dataObject.GetSerializeData(),null));
+            }
+
+            await Task.WhenAll(writeTasks);
+            complete?.Invoke();
+        }
+
+        public string Read(string groupKey, string dataKey)
         {
             if (File.Exists(FilePath) == false)
             {
@@ -199,10 +219,6 @@ namespace FlexiArchiveSystem.ArchiveOperation
             {
                 InitDBConnection();
             }
-
-            var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(key);
-            string groupKey = keyTuple.Item1;
-            string dataKey = keyTuple.Item2;
 
             bool isExist = TryGetData(groupKey, dataKey, out string result);
             if (isExist)
@@ -271,7 +287,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
             this.Dispose();
         }
 
-        public void Delete(string key)
+        public void Delete(string groupKey, string dataKey)
         {
             if (File.Exists(FilePath) == false)
             {
@@ -283,14 +299,16 @@ namespace FlexiArchiveSystem.ArchiveOperation
                 InitDBConnection();
             }
 
-            var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(key);
-            string groupKey = keyTuple.Item1;
-            string dataKey = keyTuple.Item2;
-
             string delDataCmd = $"delete from {groupKey} where dataKey='{dataKey}'";
             SqliteCommand delDataCommand = new SqliteCommand(delDataCmd, connection);
             delDataCommand.ExecuteNonQuery();
-            dataMap.Remove(key);
+            if (dataMap != null)
+            {
+                if (dataMap.TryGetValue(groupKey, out var value))
+                {
+                    value.Remove(dataKey);
+                }
+            }
         }
 
         public void DeleteGroup(string groupKey)

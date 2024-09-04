@@ -10,7 +10,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
     /// <summary>
     /// Please go to Unity-PlayerPrefsDataArchiveOperation what is core code;
     /// </summary>
-    public partial class PlayerPrefsDataArchiveOperation
+    internal partial class PlayerPrefsDataArchiveOperation
     {
         
     }

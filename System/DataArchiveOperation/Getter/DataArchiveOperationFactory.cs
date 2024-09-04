@@ -9,7 +9,7 @@ using System;
 
 namespace FlexiArchiveSystem.ArchiveOperation
 {
-    public static class DataArchiveOperationFactory
+    internal static class DataArchiveOperationFactory
     {
         public static IDataArchiveOperation CreateArchiveOperationObject(ArchiveOperationType operationType,
             int archiveID)

@@ -23,7 +23,14 @@ namespace FlexiArchiveSystem
         public T DiskData => diskData;
         public event Action OnDirtyHandler;
         public event Action<string, DataTypeSystemInfo> OnPersistentHandler;
-        private DataTypeSystemInfo _DataTypeSystemInfo;
+
+        private DataTypeSystemInfo _systemInfo;
+        
+        DataTypeSystemInfo IDataType.SystemInfo
+        {
+            get => _systemInfo;
+        }
+        
 
         public AbstractDataType(string dataStr)
         {
@@ -33,7 +40,7 @@ namespace FlexiArchiveSystem
                 diskData = data;
             }
 
-            _DataTypeSystemInfo = new DataTypeSystemInfo(this.GetType().ToString());
+            _systemInfo = new DataTypeSystemInfo(this.GetType().ToString());
         }
 
         private ArchiveOperationType _ArchiveOperationType;
@@ -43,13 +50,12 @@ namespace FlexiArchiveSystem
             _ArchiveOperationType = archiveOperationType;
         }
 
-        public void ToPersistent()
+        public void Refresh()
         {
             diskData = data;
-            OnPersistentHandler?.Invoke(Serialize(), _DataTypeSystemInfo);
         }
 
-        protected virtual string Serialize()
+        public virtual string Serialize()
         {
             return DataTypeSerializeOperation.Serialize(_ArchiveOperationType, _dataWraper);
         }

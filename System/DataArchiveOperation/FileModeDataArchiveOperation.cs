@@ -6,6 +6,7 @@
 //-------------------------------------------------
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -87,15 +88,27 @@ namespace FlexiArchiveSystem.ArchiveOperation
             jsonData[dataKey] = JsonMapper.ToObject(dataStr);
             return hasExistedBefore;
         }
-        
-        public void DataPersistent(string key, string dataStr)
+
+        private void WriteToDisk(string filePath, string text)
         {
-            var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(key);
-            string groupKey = keyTuple.Item1;
-            string dataKey = keyTuple.Item2;
+            File.WriteAllText(filePath, text);
+        }
+        
+        private async Task WriteToDiskAsync(string filePath, string text)
+        {
+            using (var sourceStream = new StreamWriter(filePath))
+            {
+                sourceStream.AutoFlush = false;
+                await sourceStream.WriteAsync(text);
+                await sourceStream.FlushAsync();
+            }
+        }
+        
+        public void DataPersistent(string groupKey, string dataKey, string dataStr)
+        {
             bool hasExistedBefore = DataPersistentReadyWork(groupKey, dataKey, dataStr);
             string groupFilePath = GetAndCombineDataFilePath(groupKey);
-            File.WriteAllText(groupFilePath, groupDataMap[groupKey].ToJson());
+            WriteToDisk(groupFilePath, groupDataMap[groupKey].ToJson());
             bool isRewriteGroupKeys = hasExistedBefore == false;
             if (isRewriteGroupKeys)
             {
@@ -103,11 +116,39 @@ namespace FlexiArchiveSystem.ArchiveOperation
             }
         }
 
-        public async Task DataPersistentAsync(string key, string dataStr, Action complete)
+        public void DataPersistent(params DataObject[] dataObjects)
         {
-            var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(key);
-            string groupKey = keyTuple.Item1;
-            string dataKey = keyTuple.Item2;
+            if (dataObjects.Length == 0)
+            {
+                return;
+            }
+            
+            HashSet<string> hashSet = new HashSet<string>();
+            foreach (var dataObject in dataObjects)
+            {
+                string key = dataObject.Key;
+                var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(key);
+                string groupKey = keyTuple.Item1;
+                string dataKey = keyTuple.Item2;
+                bool hasExistedBefore = DataPersistentReadyWork(groupKey, dataKey, dataObject.GetSerializeData());
+
+                bool isRewriteGroupKeys = hasExistedBefore == false;
+                if (isRewriteGroupKeys)
+                {
+                    TryRecordKey(groupKey, dataKey);
+                }
+                hashSet.Add(groupKey);
+            }
+
+            foreach (var groupKey in hashSet)
+            {
+                string groupFilePath = GetAndCombineDataFilePath(groupKey);
+                WriteToDisk(groupFilePath, groupDataMap[groupKey].ToJson());
+            }
+        }
+
+        public async Task DataPersistentAsync(string groupKey, string dataKey, string dataStr, Action complete)
+        {
             bool hasExistedBefore = DataPersistentReadyWork(groupKey, dataKey, dataStr);
             string groupFilePath = GetAndCombineDataFilePath(groupKey);
 
@@ -120,15 +161,39 @@ namespace FlexiArchiveSystem.ArchiveOperation
             }
             complete?.Invoke();
         }
-
-        private async Task WriteToDiskAsync(string filePath, string text)
+        
+        public async Task DataPersistentAsync(Action complete, params DataObject[] dataObjects)
         {
-            using (var sourceStream = new StreamWriter(filePath))
+            if (dataObjects.Length == 0)
             {
-                sourceStream.AutoFlush = false;
-                await sourceStream.WriteAsync(text);
-                await sourceStream.FlushAsync();
+                return;
             }
+            
+            HashSet<string> hashSet = new HashSet<string>();
+            foreach (var dataObject in dataObjects)
+            {
+                string key = dataObject.Key;
+                var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(key);
+                string groupKey = keyTuple.Item1;
+                string dataKey = keyTuple.Item2;
+                bool hasExistedBefore = DataPersistentReadyWork(groupKey, dataKey, dataObject.GetSerializeData());
+                bool isRewriteGroupKeys = hasExistedBefore == false;
+                if (isRewriteGroupKeys)
+                {
+                    TryRecordKey(groupKey, dataKey);
+                }
+                hashSet.Add(groupKey);
+            }
+
+            IList<Task> writeTasks = new List<Task>();
+            foreach (var groupKey in hashSet)
+            {
+                string groupFilePath = GetAndCombineDataFilePath(groupKey);
+                writeTasks.Add(WriteToDiskAsync(groupFilePath, groupDataMap[groupKey].ToJson()));
+            }
+            
+            await Task.WhenAll(writeTasks);
+            complete?.Invoke();
         }
 
 
@@ -142,11 +207,8 @@ namespace FlexiArchiveSystem.ArchiveOperation
             ArchiveOperationHelper.RecordKey(_archiveID, groupKey, dataKey);
         }
 
-        public string Read(string key)
+        public string Read(string groupKey, string dataKey)
         {
-            var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(key);
-            string groupKey = keyTuple.Item1;
-            string dataKey = keyTuple.Item2;
             if (Directory.Exists(Path) == false)
             {
                 return "";
@@ -190,11 +252,8 @@ namespace FlexiArchiveSystem.ArchiveOperation
             ArchiveOperationHelper.DeleteAllGroupKeyFromDisk();
         }
 
-        public void Delete(string key)
+        public void Delete(string groupKey, string dataKey)
         {
-            var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(key);
-            string groupKey = keyTuple.Item1;
-            string dataKey = keyTuple.Item2;
             bool isGet = TryGetJsonData(groupKey, out JsonData jsonData);
             if (isGet == false)
             {

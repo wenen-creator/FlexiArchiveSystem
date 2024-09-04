@@ -6,6 +6,7 @@
 //-------------------------------------------------
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using LitJson;
@@ -19,22 +20,22 @@ namespace FlexiArchiveSystem.ArchiveOperation
             get => Path;
             set => Path = value;
         }
-
-        public void ToSaveDataTypeSystemInfo(string key, DataTypeSystemInfo dataTypeSystemInfo)
+        
+        public void ToSaveDataTypeSystemInfo(string groupKey, string dataKey, DataTypeSystemInfo dataTypeSystemInfo)
         {
             string jsonStr = dataTypeSystemInfo.Serialize();
-            DataPersistent(key, jsonStr);
+            DataPersistent(groupKey, dataKey, jsonStr);
         }
 
-        public DataTypeSystemInfo ReadSystemInfo(string key)
+        public DataTypeSystemInfo ReadSystemInfo(string groupKey, string dataKey)
         {
-            string jsonStr = Read(key);
+            string jsonStr = Read(groupKey, dataKey);
             return JsonMapper.ToObject<DataTypeSystemInfo>(jsonStr);
         }
 
-        public Type GetTypeOfDataValue(string key)
+        public Type GetTypeOfDataValue(string groupKey, string dataKey)
         {
-            DataTypeSystemInfo dataTypeSystemInfo = ReadSystemInfo(key);
+            DataTypeSystemInfo dataTypeSystemInfo = ReadSystemInfo(groupKey, dataKey);
             return Type.GetType(dataTypeSystemInfo.systemType);
         }
 

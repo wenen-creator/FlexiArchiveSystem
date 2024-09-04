@@ -18,7 +18,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
     /// Playerprefs注册表形式的存档方式
     /// notice: 出于性能考虑，因此该方式目前不支持多存档共存。
     /// </summary>
-    public partial class PlayerPrefsDataArchiveOperation : IDataArchiveOperation
+    internal partial class PlayerPrefsDataArchiveOperation : IDataArchiveOperation
     {
         public bool IsValidation
         {
@@ -66,11 +66,8 @@ namespace FlexiArchiveSystem.ArchiveOperation
             _archiveID = archiveID;
         }
 
-        public void DataPersistent(string key, string dataStr)
+        public void DataPersistent(string groupKey, string dataKey, string dataStr)
         {
-            var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(key);
-            string groupKey = keyTuple.Item1;
-            string dataKey = keyTuple.Item2;
 
             bool hasExistedBefore =TryGetJsonData(groupKey, out JsonData jsonData);
             bool isRewriteGroupKeys = hasExistedBefore == false;
@@ -82,16 +79,23 @@ namespace FlexiArchiveSystem.ArchiveOperation
             }
         }
 
-        public async Task DataPersistentAsync(string key, string dataStr, Action complete)
+        public void DataPersistent(params DataObject[] dataObjects)
         {
-            throw new NotImplementedException("PlayerPrefs不支持异步保存");
+            throw new NotImplementedException();
         }
 
-        public string Read(string key)
+        public async Task DataPersistentAsync(string groupKey, string dataKey, string dataStr, Action complete)
         {
-            var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(key);
-            string groupKey = keyTuple.Item1;
-            string dataKey = keyTuple.Item2;
+            throw new NotImplementedException("PlayerPrefs does not support asynchronous saving");
+        }
+
+        public async Task DataPersistentAsync(Action complete, params DataObject[] dataObjects)
+        {
+            throw new NotImplementedException("PlayerPrefs does not support asynchronous saving");
+        }
+
+        public string Read(string groupKey, string dataKey)
+        {
             bool isGet = TryGetJsonData(groupKey, out JsonData jsonData);
 
             if (isGet == false)
@@ -136,11 +140,8 @@ namespace FlexiArchiveSystem.ArchiveOperation
         }
 #pragma warning restore CS1998
 
-        public void Delete(string key)
+        public void Delete(string groupKey, string dataKey)
         {
-            var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(key);
-            string groupKey = keyTuple.Item1;
-            string dataKey = keyTuple.Item2;
             bool isGet = TryGetJsonData(groupKey, out JsonData jsonData);
             if (isGet == false)
             {

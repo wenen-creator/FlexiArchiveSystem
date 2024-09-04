@@ -20,7 +20,7 @@ namespace FlexiArchiveSystem.Entry
         public List<string> dirtyDataGroupList = new List<string>();
         private IArchiveSetting _dataArchiveSetting;
 
-        public DataArchiveContainer(IArchiveSetting dataArchiveSetting)
+        internal DataArchiveContainer(IArchiveSetting dataArchiveSetting)
         {
             this._dataArchiveSetting = dataArchiveSetting;
         }

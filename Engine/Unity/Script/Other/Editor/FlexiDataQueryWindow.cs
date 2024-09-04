@@ -323,7 +323,10 @@ namespace FlexiArchiveSystem.U3DEditor
 
         private ResultWrapper QueryResult(DataObject dataObject, string fullKey)
         {
-            Type dataTypeSystemType = DataArchiveSetting.DataTypeSystemInfoOperation.GetTypeOfDataValue(fullKey);
+            var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(fullKey);
+            string groupKey = keyTuple.Item1;
+            string dataKey = keyTuple.Item2;
+            Type dataTypeSystemType = DataArchiveSetting.DataTypeSystemInfoOperation.GetTypeOfDataValue(groupKey, dataKey);
             Type valueType = dataTypeSystemType.BaseType.GetGenericArguments()[0];
             var methodInfo_GetData = dataObject.GetType().GetMethod("GetData");
             methodInfo_GetData = methodInfo_GetData.MakeGenericMethod(dataTypeSystemType);

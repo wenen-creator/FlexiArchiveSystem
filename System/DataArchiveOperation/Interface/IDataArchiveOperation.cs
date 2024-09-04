@@ -6,6 +6,7 @@
 //-------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FlexiArchiveSystem.ArchiveOperation
@@ -17,13 +18,17 @@ namespace FlexiArchiveSystem.ArchiveOperation
         public void SetDataArchiveOperationHelper(DataArchiveOperationHelper helper);
         public void Init(int archiveID);
         public void SetArchiveID(int archiveID);
-        public void DataPersistent(string key, string dataStr);
+        public void DataPersistent(string groupKey, string dataKey, string dataStr);
         
-        public Task DataPersistentAsync(string key, string dataStr, Action complete);
+        public void DataPersistent(params DataObject[] dataObjects);
+
+        public Task DataPersistentAsync(string groupKey, string dataKey, string dataStr, Action complete);
+
+        public Task DataPersistentAsync(Action complete, params DataObject[] dataObjects);
         
-        public string Read(string key);
+        public string Read(string groupKey, string dataKey);
         public Task DeleteAll();
-        public void Delete(string key);
+        public void Delete(string groupKey, string dataKey);
 
         public void DeleteGroup(string groupKey);
 

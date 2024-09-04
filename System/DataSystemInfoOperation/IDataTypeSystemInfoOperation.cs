@@ -12,8 +12,8 @@ namespace FlexiArchiveSystem
     public interface IDataTypeSystemInfoOperation
     {
         public string SystemInfoPath { get; set; }
-        public void ToSaveDataTypeSystemInfo(string key, DataTypeSystemInfo dataTypeSystemInfo);
-        public DataTypeSystemInfo ReadSystemInfo(string key);
-        public Type GetTypeOfDataValue(string key);
+        public void ToSaveDataTypeSystemInfo(string groupKey, string dataKey, DataTypeSystemInfo dataTypeSystemInfo);
+        public DataTypeSystemInfo ReadSystemInfo(string groupKey, string dataKey);
+        public Type GetTypeOfDataValue(string groupKey, string dataKey);
     }
 }
