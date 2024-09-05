@@ -13,6 +13,7 @@ using System.Reflection;
 using FlexiArchiveSystem.Assist;
 using UnityEditor;
 using UnityEngine;
+using Logger = FlexiArchiveSystem.Assist.Logger;
 using Object = UnityEngine.Object;
 
 namespace FlexiArchiveSystem.U3DEditor
@@ -314,9 +315,10 @@ namespace FlexiArchiveSystem.U3DEditor
                 SetResult(fullKey, result);
                 AddMonitor(dataObject);
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 isQueryError = true;
+                Assist.Logger.LOG_ERROR(e.Message);
             }
 
         }
@@ -326,11 +328,20 @@ namespace FlexiArchiveSystem.U3DEditor
             var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(fullKey);
             string groupKey = keyTuple.Item1;
             string dataKey = keyTuple.Item2;
-            Type dataTypeSystemType = DataArchiveSetting.DataTypeSystemInfoOperation.GetTypeOfDataValue(groupKey, dataKey);
-            if (dataTypeSystemType == null)
+            Type dataTypeSystemType = null;
+            try
             {
-                Debug.LogError("SystemInfo信息缺失");
+                dataTypeSystemType = DataArchiveSetting.DataTypeSystemInfoOperation.GetTypeOfDataValue(groupKey, dataKey);
+                if (dataTypeSystemType == null)
+                {
+                    Logger.LOG_ERROR("SystemInfo信息缺失");
+                }
             }
+            catch (Exception)
+            {
+                Logger.LOG_ERROR("获取SystemInfo出错");
+            }
+            
             Type valueType = dataTypeSystemType.BaseType.GetGenericArguments()[0];
             var methodInfo_GetData = dataObject.GetType().GetMethod("GetData");
             methodInfo_GetData = methodInfo_GetData.MakeGenericMethod(dataTypeSystemType);

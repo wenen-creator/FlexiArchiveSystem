@@ -126,16 +126,7 @@ namespace FlexiArchiveSystem
 
         public void ClearMemoryCache() => ArchiveContainer.ClearMemoryCache();
 
-        public virtual void Dispose()
-        {
-            if (ArchiveSetting != null)
-            {
-#if !UNITY_EDITOR
-            UnityEngine.ScriptableObject.DestroyImmediate(ArchiveSetting);
-#endif
-                ArchiveSetting = null;
-            }
-        }
+        public virtual void Dispose() { }
 
         private void OnApplicationQuit()
         {
@@ -148,7 +139,14 @@ namespace FlexiArchiveSystem
             {
                 ArchiveSetting.DataArchiveOperation?.Dispose();
                 ArchiveSetting.DataTypeSystemInfoOperation?.Dispose();
+                if (Application.isPlaying)
+                {
+                    ArchiveSetting.Dispose();
+                }
+                ArchiveSetting = null;
             }
+
+            Dispose();
 
             GC.Collect();
             GC.WaitForPendingFinalizers();

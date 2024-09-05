@@ -15,7 +15,7 @@ using UnityEngine;
 namespace FlexiArchiveSystem
 {
     [CreateAssetMenu(fileName = "DataArchiveSetting", menuName = "Flexi Archive System/DataArchiveSetting")]
-    public partial class FlexiArchiveSetting : ScriptableObject, IArchiveSetting
+    public partial class FlexiArchiveSetting : ScriptableObject, IArchiveSetting, IDisposable
     {
         [SerializeField] private ArchiveOperationType archiveOperationType = ArchiveOperationType.Sqlite;
 
@@ -34,7 +34,9 @@ namespace FlexiArchiveSystem
         public bool IsAllowSaveDataSystemInfoInPlayerDevice => _AllowSaveDataSystemInfo;
 
         public int CurrentArchiveID { get; private set; }
-        public List<int> AllArchiveID { get; private set; }
+
+        [NonSerialized] private List<int> _AllArchiveID = null;
+        public List<int> AllArchiveID => _AllArchiveID;
         public IDataArchiveOperation DataArchiveOperation { get; set; }
         public DataSystemInfoArchiveOperation DataTypeSystemInfoOperation { get; set; }
         public string Name => name;
@@ -111,25 +113,25 @@ namespace FlexiArchiveSystem
 
         public List<int> GetAllArchiveID()
         {
-            if (AllArchiveID == null)
+            if (_AllArchiveID == null)
             {
-                AllArchiveID = GetAllArchiveIDFromDisk();
+                _AllArchiveID = GetAllArchiveIDFromDisk();
             }
 
-            return AllArchiveID;
+            return _AllArchiveID;
         }
 
         private void RecordCurArchiveIDIntoMemory(int id)
         {
-            if (AllArchiveID != null && AllArchiveID.IndexOf(id) == -1)
+            if (_AllArchiveID != null && _AllArchiveID.IndexOf(id) == -1)
             {
-                AllArchiveID.Add(id);
+                _AllArchiveID.Add(id);
             }
         }
 
         public void ClearAllArchiveIDCacheInMemory()
         {
-            AllArchiveID = null;
+            _AllArchiveID = null;
         }
 
         private List<int> GetAllArchiveIDFromDisk()
@@ -175,6 +177,14 @@ namespace FlexiArchiveSystem
             }
 
             return allArchiveID;
+        }
+
+        public void Dispose()
+        {
+            CurrentArchiveID = 0;
+            _AllArchiveID = null;
+            DataArchiveOperation = null;
+            DataTypeSystemInfoOperation = null;
         }
     }
 }
