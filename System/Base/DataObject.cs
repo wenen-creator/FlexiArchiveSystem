@@ -8,6 +8,7 @@
 using System;
 using System.Threading.Tasks;
 using FlexiArchiveSystem.ArchiveOperation;
+using FlexiArchiveSystem.Setting;
 
 namespace FlexiArchiveSystem
 {

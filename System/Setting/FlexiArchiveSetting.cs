@@ -8,7 +8,7 @@
 using System.Collections.Generic;
 using FlexiArchiveSystem.ArchiveOperation;
 
-namespace FlexiArchiveSystem
+namespace FlexiArchiveSystem.Setting
 {
     /// <summary>
     /// Please go to Unity-FlexiArchiveSetting what is core code;

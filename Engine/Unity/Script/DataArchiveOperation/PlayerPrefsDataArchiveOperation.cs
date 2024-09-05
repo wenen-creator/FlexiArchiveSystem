@@ -75,7 +75,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
             PlayerPrefs.SetString(DataArchiveConstData.GetGroupKeyInPlayerPrefs(groupKey), jsonData.ToJson());
             if (isRewriteGroupKeys)
             {
-                TryRecordKey(groupKey, dataKey);   
+                TryRecordKey(groupKey);   
             }
         }
 
@@ -167,13 +167,13 @@ namespace FlexiArchiveSystem.ArchiveOperation
             ArchiveOperationHelper.RemoveGroupKey(groupKey);
         }
 
-        public virtual void TryRecordKey(string groupKey, string dataKey)
+        public virtual void TryRecordKey(string groupKey)
         {
             if (AllGroupKeys != null)
             {
                 AllGroupKeys.Add(groupKey);
             }
-            ArchiveOperationHelper.RecordKey(_archiveID, groupKey, dataKey);
+            ArchiveOperationHelper.RecordKey(_archiveID, groupKey);
         }
 
         public void TryRemoveAllGroupKey()
@@ -222,6 +222,11 @@ namespace FlexiArchiveSystem.ArchiveOperation
             AllGroupKeys = null;
             groupDataMap = null;
             IsActive = false;
+        }
+
+        public async Task DisposeAsync()
+        {
+            Dispose();
         }
     }
 }

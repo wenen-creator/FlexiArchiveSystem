@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FlexiArchiveSystem.Assist;
+using FlexiArchiveSystem.Setting;
 
 namespace FlexiArchiveSystem
 {
@@ -125,10 +126,9 @@ namespace FlexiArchiveSystem
             foreach (var dirtyDataObject in dirtyDataObjectList)
             {
                 dirtyDataObject._dataType.Refresh();
-                dirtyDataObject.TryToSaveDataSystemInfo();
                 dirtyDataObject.CleanDirty();
             }
-            
+            TryToSaveSystemInfo(null, dirtyDataObjectList);
             complete?.Invoke();
            
             if (_ArchiveSetting.IsLog)
@@ -137,6 +137,18 @@ namespace FlexiArchiveSystem
             }
 
             dirtyDataObjectKeys.Clear();
+        }
+        
+        private void TryToSaveSystemInfo(Action complete, params DataObject[] dataObjects)
+        {
+#if UNITY_EDITOR
+            _ArchiveSetting.DataTypeSystemInfoOperation.DataPersistentAsync(complete, dataObjects);
+#else
+         if (_ArchiveSetting.IsAllowSaveDataSystemInfoInPlayerDevice)
+         {
+            _ArchiveSetting.DataTypeSystemInfoOperation.DataPersistentAsync(complete, dataObjects);
+         }
+#endif
         }
 
         public void Dispose()

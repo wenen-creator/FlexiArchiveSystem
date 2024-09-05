@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using FlexiArchiveSystem.ArchiveOperation;
 using FlexiArchiveSystem.Assist;
+using FlexiArchiveSystem.Setting;
 
 namespace FlexiArchiveSystem.Entry
 {
@@ -131,8 +132,17 @@ namespace FlexiArchiveSystem.Entry
 
         public async void DeleteAll()
         {
+#if !UNITY_EDITOR
+                if (_dataArchiveSetting.IsAllowSaveDataSystemInfoInPlayerDevice)
+                {
+                    await _dataArchiveSetting.DataTypeSystemInfoOperation.DeleteAll();
+                }
+#else
             await _dataArchiveSetting.DataTypeSystemInfoOperation.DeleteAll();
+#endif
+
             await _dataArchiveSetting.DataArchiveOperation.DeleteAll();
+            
             _dataArchiveSetting.RefreshArchiveOperation();
             ClearMemoryCache();
         }
@@ -162,10 +172,10 @@ namespace FlexiArchiveSystem.Entry
                 {
                     targetArchiveOperation.SetDataArchiveOperationHelper(currentDataArchiveOperation
                         .ArchiveOperationHelper);
-                    currentDataArchiveOperation.Dispose();
+                    await currentDataArchiveOperation.DisposeAsync();
                     await target.CloneTo(source);
                     newDataArchiveOperation = target as IDataArchiveOperation;
-                    CreateNewSystemInfoCoupleWithArchive(nextArchiveID);
+                    await CreateNewSystemInfoCoupleWithArchive(nextArchiveID);
                 }
             }
             else
@@ -178,10 +188,16 @@ namespace FlexiArchiveSystem.Entry
             if (_dataArchiveSetting.IsLog) Logger.LOG("克隆存档成功");
             complete?.Invoke();
         }
-
-        [Conditional("UNITY_EDITOR")]
-        private async void CreateNewSystemInfoCoupleWithArchive(int nextArchiveID)
+        
+        private async Task CreateNewSystemInfoCoupleWithArchive(int nextArchiveID)
         {
+#if !UNITY_EDITOR
+            if (_dataArchiveSetting.IsAllowSaveDataSystemInfoInPlayerDevice == false)
+            {
+                Logger.LOG("不允许保存SystemInfo");
+                return;
+            }
+#endif
             var currentSystemInfoOperation = _dataArchiveSetting.DataTypeSystemInfoOperation;
             var source = await currentSystemInfoOperation.GetSource();
             var newSystemInfo = DataArchiveOperationFactory.CreateArchiveSystemInfoOperationObject(
@@ -189,6 +205,7 @@ namespace FlexiArchiveSystem.Entry
                 nextArchiveID);
             newSystemInfo.Init(nextArchiveID);
             newSystemInfo.SetDataArchiveOperationHelper(currentSystemInfoOperation.ArchiveOperationHelper);
+            await currentSystemInfoOperation.DisposeAsync();
             await newSystemInfo.CloneTo(source);
             _dataArchiveSetting.DataTypeSystemInfoOperation = newSystemInfo;
         }

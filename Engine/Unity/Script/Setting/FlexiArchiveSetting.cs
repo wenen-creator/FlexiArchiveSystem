@@ -12,7 +12,7 @@ using System.IO;
 using FlexiArchiveSystem.ArchiveOperation;
 using UnityEngine;
 
-namespace FlexiArchiveSystem
+namespace FlexiArchiveSystem.Setting
 {
     [CreateAssetMenu(fileName = "DataArchiveSetting", menuName = "Flexi Archive System/DataArchiveSetting")]
     public partial class FlexiArchiveSetting : ScriptableObject, IArchiveSetting, IDisposable
@@ -86,10 +86,15 @@ namespace FlexiArchiveSystem
             SetArchiveID(archiveID);
             RefreshArchiveOperation();
         }
-
-        [Conditional("UNITY_EDITOR")]
+        
         public void RefreshArchiveSystemInfoOperation()
         {
+#if !UNITY_EDITOR
+            if (IsAllowSaveDataSystemInfoInPlayerDevice == false)
+            {
+                return;
+            }
+#endif
             DataTypeSystemInfoOperation.Dispose();
             DataTypeSystemInfoOperation.Init(CurrentArchiveID);
         }
@@ -101,10 +106,15 @@ namespace FlexiArchiveSystem
             DataArchiveOperation.Init(CurrentArchiveID);
             RebuildArchiveSystemInfoOperationInEditor();
         }
-
-        [Conditional("UNITY_EDITOR")]
+        
         private void RebuildArchiveSystemInfoOperationInEditor()
         {
+#if !UNITY_EDITOR
+            if (IsAllowSaveDataSystemInfoInPlayerDevice == false)
+            {
+                return;
+            }
+#endif
             DataTypeSystemInfoOperation =
                 DataArchiveOperationFactory.CreateArchiveSystemInfoOperationObject(archiveOperationType,
                     CurrentArchiveID);

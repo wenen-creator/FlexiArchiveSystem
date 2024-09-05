@@ -12,6 +12,9 @@ using System.Data;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using FlexiArchiveSystem.ArchiveOperation.IO;
+using FlexiArchiveSystem.Assist;
+using FlexiArchiveSystem.Setting;
 using Mono.Data.Sqlite;
 
 namespace FlexiArchiveSystem.ArchiveOperation
@@ -135,7 +138,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
             bool hasExistedBefore = string.IsNullOrEmpty(lastResult) == false;
             if (hasExistedBefore == false)
             {
-                TryRecordKey(groupKey, dataKey);
+                TryRecordKey(groupKey);
             }
         }
 
@@ -187,7 +190,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
             bool hasExistedBefore = string.IsNullOrEmpty(lastResult) == false;
             if (hasExistedBefore == false)
             {
-                TryRecordKey(groupKey, dataKey);
+                TryRecordKey(groupKey);
             }
             
             complete?.Invoke();
@@ -264,7 +267,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
             {
                 return;
             }
-
+            
             if (connection != null)
             {
                 try
@@ -274,13 +277,20 @@ namespace FlexiArchiveSystem.ArchiveOperation
                     SqliteConnection.ClearPool(connection);
                     connection = null;
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    throw e;
                 }
             }
 
             if (Directory.Exists(Path))
             {
+                bool isUse = await IOHelper.FileIsInUse(FilePath, 1000, 200);
+                if (isUse)
+                {
+                    Logger.LOG_ERROR($"文件{FilePath}长时间被占用，无法删除存档");
+                    return;
+                }
                 Directory.Delete(Path, true);
             }
 
@@ -333,24 +343,33 @@ namespace FlexiArchiveSystem.ArchiveOperation
             }
         }
 
-        public void TryRecordKey(string groupKey, string dataKey)
+        public void TryRecordKey(string groupKey)
         {
             if (AllGroupKeys != null)
             {
                 AllGroupKeys.Add(groupKey);
             }
 
-            ArchiveOperationHelper.RecordKey(_archiveID, groupKey, dataKey);
+            ArchiveOperationHelper.RecordKey(_archiveID, groupKey);
         }
 
         public void TryRemoveAllGroupKey()
         {
             ArchiveOperationHelper.DeleteAllGroupKeyFromDisk();
         }
+        
+        private async Task<List<string>> LoadAllGroupKeyFromDisk()
+        {
+            return await ArchiveOperationHelper.GetAllGroupKey();
+        }
 
 #pragma warning disable CS1998
         public async Task<IDataArchiveSourceWrapper> GetSource()
         {
+            if (AllGroupKeys == null)
+            {
+                AllGroupKeys = await LoadAllGroupKeyFromDisk();
+            }
             SqliteArchiveSourceWrapper wrapper = new SqliteArchiveSourceWrapper();
             wrapper.sourcePath = FilePath;
             return wrapper;
@@ -370,47 +389,63 @@ namespace FlexiArchiveSystem.ArchiveOperation
             {
                 Directory.CreateDirectory(Path);
             }
-
-            StringBuilder sb = new StringBuilder();
+            
             byte[] buffer = new byte[0x1000];
             int readLen;
-            using (var reader = new FileStream(
-                       wrapper.sourcePath,
-                       FileMode.Open, FileAccess.Read, FileShare.Read,
-                       bufferSize: 4096, useAsync: true))
+            bool isUse = await IOHelper.FileIsInUse(wrapper.sourcePath, 1000 ,200);
+            if (isUse)
             {
-                using (var writer = new FileStream(
-                           FilePath,
-                           FileMode.OpenOrCreate, FileAccess.Write, FileShare.Write,
-                           bufferSize: 4096, useAsync: true))
-                {
-                    while ((readLen = await reader.ReadAsync(buffer, 0,buffer.Length)) != 0)
-                    {
-                        await writer.WriteAsync(buffer,0,buffer.Length);
-                    }
-                }
-                
+                Logger.LOG_ERROR($"文件{wrapper.sourcePath}长时间被占用，无法克隆存档");
+                return;
             }
 
+            using var reader = new FileStream(wrapper.sourcePath, FileMode.Open, 
+                FileAccess.Read, FileShare.None, bufferSize: 4096, useAsync: true);
+            using var writer = new FileStream(FilePath, FileMode.OpenOrCreate, 
+                FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true);
+            while ((readLen = await reader.ReadAsync(buffer, 0, buffer.Length)) != 0)
+            {
+                await writer.WriteAsync(buffer, 0, buffer.Length);
+            }
+            ArchiveOperationHelper.RecordAllGroupKeyWhenClone(_archiveID);
+        }
+
+        public async Task CloseIOAsync()
+        {
+            if (connection != null)
+            {
+                await connection.DisposeAsync();
+            }
         }
 
         public void Dispose()
         {
             if (connection != null)
             {
-                try
-                {
-                    connection.Dispose();
-                    SqliteConnection.ClearPool(connection);
-                }
-                catch (Exception)
-                {
-                }
+                connection.Dispose();
             }
 
+            archiveOperationHelper = null;
             connection = null;
             IsActive = false;
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
+
+        public async Task DisposeAsync()
+        {
+            if (connection != null)
+            {
+                await connection.DisposeAsync();
+            }
+
+            archiveOperationHelper = null;
+            connection = null;
+            IsActive = false;
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+        }
+        
 
         private string GetAndCombineDataFilePath()
         {

@@ -32,7 +32,9 @@ namespace FlexiArchiveSystem.ArchiveOperation
 
         public void DeleteGroup(string groupKey);
 
-        public void TryRecordKey(string groupKey, string dataKey);
+        public Task DisposeAsync();
+
+        public void TryRecordKey(string groupKey);
 
         public void TryRemoveAllGroupKey();
     }

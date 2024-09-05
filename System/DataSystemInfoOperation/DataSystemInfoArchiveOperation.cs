@@ -6,6 +6,7 @@
 //-------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -20,7 +21,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
             get => Path;
             set => Path = value;
         }
-        
+
         public void ToSaveDataTypeSystemInfo(string groupKey, string dataKey, DataTypeSystemInfo dataTypeSystemInfo)
         {
             string jsonStr = dataTypeSystemInfo.Serialize();
@@ -31,6 +32,38 @@ namespace FlexiArchiveSystem.ArchiveOperation
         {
             string jsonStr = dataTypeSystemInfo.Serialize();
             await DataPersistentAsync(groupKey, dataKey, jsonStr, null);
+        }
+
+        public override async Task DataPersistentAsync(Action complete, params DataObject[] dataObjects)
+        {
+            if (dataObjects.Length == 0)
+            {
+                return;
+            }
+            
+            HashSet<string> hashSet = new HashSet<string>();
+            foreach (var dataObject in dataObjects)
+            {
+                string key = dataObject.Key;
+                var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(key);
+                string groupKey = keyTuple.Item1;
+                string dataKey = keyTuple.Item2;
+                DataPersistentReadyWork(groupKey, dataKey, dataObject._dataType.SystemInfo.Serialize());
+
+                hashSet.Add(groupKey);
+            }
+
+            IList<Task> writeTasks = new List<Task>();
+            foreach (var groupKey in hashSet)
+            {
+                string groupFilePath = GetAndCombineDataFilePath(groupKey);
+                writeTasks.Add(WriteToDiskAsync(groupFilePath, groupDataMap[groupKey].ToJson()));
+            }
+            
+
+            await Task.WhenAll(writeTasks);
+
+            complete?.Invoke();
         }
 
         public bool ReadSystemInfo(string groupKey, string dataKey, out DataTypeSystemInfo systemInfo)
@@ -55,7 +88,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
             return Type.GetType(dataTypeSystemInfo.systemType);
         }
 
-        public override void TryRecordKey(string groupKey, string dataKey)
+        public override void TryRecordKey(string groupKey)
         {
             //no record
         }
@@ -75,6 +108,11 @@ namespace FlexiArchiveSystem.ArchiveOperation
         public override void TryRemoveAllGroupKey()
         {
             //no handler
+        }
+
+        protected override void RecordAllGroupKeys()
+        {
+            
         }
     }
 }

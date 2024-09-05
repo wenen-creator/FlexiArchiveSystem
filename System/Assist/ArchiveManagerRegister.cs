@@ -6,6 +6,7 @@
 //-------------------------------------------------
 
 using System.Collections.Generic;
+using FlexiArchiveSystem.Setting;
 
 namespace FlexiArchiveSystem.Assist
 {

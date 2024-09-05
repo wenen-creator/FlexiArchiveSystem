@@ -5,11 +5,15 @@
 //        email: yixiangluntan@163.com
 //-------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using FlexiArchiveSystem.ArchiveOperation.IO;
+using FlexiArchiveSystem.Assist;
 using LitJson;
 
 namespace FlexiArchiveSystem.ArchiveOperation
@@ -21,13 +25,15 @@ namespace FlexiArchiveSystem.ArchiveOperation
         private bool GroupKeysJsonDataIsDirty => groupKeysJsonData == null;
 
         private int _archiveID = -1;
+        
+        private Dictionary<int, CancellationTokenSource> WriteCancellationTokenSourceMap = new Dictionary<int, CancellationTokenSource>();
 
         public void SetArchiveID(int archiveID)
         {
             _archiveID = archiveID;
         }
         
-        public void RecordKey(int archiveID, string groupKey, string dataKey)
+        public void RecordKey(int archiveID, string groupKey)
         {
             UpdateDirtyState(archiveID);
             //记录key
@@ -40,6 +46,21 @@ namespace FlexiArchiveSystem.ArchiveOperation
             //记录key
             GroupKeys = groupKeys;
             groupKeysJsonData = ConvertToJsonData(groupKeys);
+            WriteToDisk(groupKeysJsonData);
+        }
+        
+        /// <summary>
+        /// 必须保证前后使用的helper是一致的，且数据为更改
+        /// </summary>
+        /// <param name="archiveID"></param>
+        public async void RecordAllGroupKeyWhenClone(int archiveID)
+        {
+            if (GroupKeysJsonDataIsDirty)
+            {
+                //cache
+                await GetAllGroupKey();
+            }
+            SetArchiveID(archiveID);
             WriteToDisk(groupKeysJsonData);
         }
 
@@ -71,8 +92,8 @@ namespace FlexiArchiveSystem.ArchiveOperation
 
             groupKeys.Add(groupKey);
             GroupKeys = groupKeys;
-            groupKeysJsonData = ConvertToJsonData(groupKeys);
-            WriteToDisk(groupKeysJsonData);
+            groupKeysJsonData.Add(groupKey);
+            await WriteAysncToDisk(groupKeysJsonData);
         }
 
         public async Task<List<string>> GetAllGroupKey()
@@ -82,13 +103,14 @@ namespace FlexiArchiveSystem.ArchiveOperation
                 return GroupKeys;
             }
 
-            JsonData groupKeysJson = await TryGetLoadGroupKeysJsonData();
-            if (groupKeysJson == null)
+            groupKeysJsonData = await TryGetLoadGroupKeysJsonData();
+            if (groupKeysJsonData == null)
             {
                 return null;
             }
 
-            return JsonMapper.ToObject<List<string>>(groupKeysJson.ToJson());
+            GroupKeys = JsonMapper.ToObject<List<string>>(groupKeysJsonData.ToJson());
+            return GroupKeys;
         }
 
         private JsonData ConvertToJsonData(List<string> groupKeys)
@@ -104,8 +126,41 @@ namespace FlexiArchiveSystem.ArchiveOperation
 
         private void WriteToDisk(JsonData jsonData)
         {
-            // PlayerPrefs.SetString(, jsonData.ToJson());
-            File.WriteAllText(DataArchiveConstData.GetArchiveGroupKeysFilePath(_archiveID), jsonData.ToJson());
+            using (StreamWriter streamWriter = new StreamWriter(DataArchiveConstData.GetArchiveGroupKeysFilePath(_archiveID)))
+            {
+                streamWriter.AutoFlush = false;
+                streamWriter.Write(jsonData.ToJson());
+                streamWriter.Flush();
+            }
+        }
+        
+        private async Task WriteAysncToDisk(JsonData jsonData)
+        {
+            WriteCancellationTokenSourceMap.TryGetValue(_archiveID,out var tokenSource);
+            if (tokenSource != null)
+            {
+                tokenSource.Cancel();
+                tokenSource.Dispose();
+            }
+
+            string filePath = DataArchiveConstData.GetArchiveGroupKeysFilePath(_archiveID);
+            bool isUse = await IOHelper.FileIsInUse(filePath, 300,100);
+            if (isUse)
+            {
+                Logger.LOG_ERROR($"文件{filePath}长时间被占用，无法写入辅助信息");
+                return;
+            }
+            using (StreamWriter streamWriter = new StreamWriter(filePath))
+            {
+                tokenSource = new CancellationTokenSource();
+                WriteCancellationTokenSourceMap[_archiveID] = tokenSource;
+                ReadOnlyMemory<char> readOnlyMemory = new ReadOnlyMemory<char>(jsonData.ToJson().ToCharArray());
+                streamWriter.AutoFlush = false;
+                await streamWriter.WriteAsync(readOnlyMemory, tokenSource.Token);
+                await streamWriter.FlushAsync();
+                tokenSource.Dispose();
+                WriteCancellationTokenSourceMap.Remove(_archiveID);
+            }
         }
 
         private async Task<JsonData> TryGetLoadGroupKeysJsonData()

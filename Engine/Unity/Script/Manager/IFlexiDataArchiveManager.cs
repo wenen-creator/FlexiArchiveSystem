@@ -9,6 +9,7 @@ using System;
 using System.Diagnostics;
 using FlexiArchiveSystem.Assist;
 using FlexiArchiveSystem.Entry;
+using FlexiArchiveSystem.Setting;
 using UnityEngine;
 
 namespace FlexiArchiveSystem

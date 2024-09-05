@@ -5,6 +5,8 @@
 //        email: yixiangluntan@163.com
 //-------------------------------------------------
 
+using FlexiArchiveSystem.Setting;
+
 namespace FlexiArchiveSystem
 {
     public struct ArchiveSettingWrapper

@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using LitJson;
 
@@ -32,7 +33,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
 
         private string FilePath;
 
-        private Dictionary<string, JsonData> groupDataMap;
+        protected Dictionary<string, JsonData> groupDataMap;
 
         public List<string> AllGroupKeys;
 
@@ -52,6 +53,8 @@ namespace FlexiArchiveSystem.ArchiveOperation
             }
         }
 
+        private Dictionary<string, CancellationTokenSource> WriteCancellationTokenSourceMap;
+
         public void SetDataArchiveOperationHelper(DataArchiveOperationHelper helper)
         {
             helper.SetArchiveID(_archiveID);
@@ -63,6 +66,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
             SetArchiveID(archiveID);
             groupDataMap = new Dictionary<string, JsonData>();
             IsActive = true;
+            WriteCancellationTokenSourceMap = new Dictionary<string, CancellationTokenSource>();
         }
 
         public void SetArchiveID(int archiveID)
@@ -70,7 +74,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
             _archiveID = archiveID;
         }
 
-        private bool DataPersistentReadyWork(string groupKey,string dataKey, string dataStr)
+        protected bool DataPersistentReadyWork(string groupKey,string dataKey, string dataStr)
         {
             if (Directory.Exists(Path) == false)
             {
@@ -94,13 +98,27 @@ namespace FlexiArchiveSystem.ArchiveOperation
             File.WriteAllText(filePath, text);
         }
         
-        private async Task WriteToDiskAsync(string filePath, string text)
+        protected async Task WriteToDiskAsync(string filePath, string text)
         {
+            //char stream
+            
+            WriteCancellationTokenSourceMap.TryGetValue(filePath, out var cancelTokenSource);
+            if (cancelTokenSource != null)
+            {
+                cancelTokenSource.Cancel();
+                cancelTokenSource.Dispose(); 
+            }
+            
             using (var sourceStream = new StreamWriter(filePath))
             {
                 sourceStream.AutoFlush = false;
-                await sourceStream.WriteAsync(text);
+                ReadOnlyMemory<char> readOnlyMemory = new ReadOnlyMemory<char>(text.ToCharArray());
+                
+                cancelTokenSource = CreateCancelTokenSource(filePath);
+                await sourceStream.WriteAsync(readOnlyMemory, cancelTokenSource.Token);
                 await sourceStream.FlushAsync();
+                cancelTokenSource.Dispose();
+                WriteCancellationTokenSourceMap.Remove(filePath);
             }
         }
         
@@ -112,7 +130,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
             bool isRewriteGroupKeys = hasExistedBefore == false;
             if (isRewriteGroupKeys)
             {
-                TryRecordKey(groupKey, dataKey);
+                TryRecordKey(groupKey);
             }
         }
 
@@ -135,7 +153,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
                 bool isRewriteGroupKeys = hasExistedBefore == false;
                 if (isRewriteGroupKeys)
                 {
-                    TryRecordKey(groupKey, dataKey);
+                    TryRecordKey(groupKey);
                 }
                 hashSet.Add(groupKey);
             }
@@ -151,18 +169,18 @@ namespace FlexiArchiveSystem.ArchiveOperation
         {
             bool hasExistedBefore = DataPersistentReadyWork(groupKey, dataKey, dataStr);
             string groupFilePath = GetAndCombineDataFilePath(groupKey);
-
-            await WriteToDiskAsync(groupFilePath, groupDataMap[groupKey].ToJson());
             
+            await WriteToDiskAsync(groupFilePath, groupDataMap[groupKey].ToJson());
+
             bool isRewriteGroupKeys = hasExistedBefore == false;
             if (isRewriteGroupKeys)
             {
-                TryRecordKey(groupKey, dataKey);
+                TryRecordKey(groupKey);
             }
             complete?.Invoke();
         }
         
-        public async Task DataPersistentAsync(Action complete, params DataObject[] dataObjects)
+        public virtual async Task DataPersistentAsync(Action complete, params DataObject[] dataObjects)
         {
             if (dataObjects.Length == 0)
             {
@@ -180,7 +198,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
                 bool isRewriteGroupKeys = hasExistedBefore == false;
                 if (isRewriteGroupKeys)
                 {
-                    TryRecordKey(groupKey, dataKey);
+                    TryRecordKey(groupKey);
                 }
                 hashSet.Add(groupKey);
             }
@@ -193,18 +211,18 @@ namespace FlexiArchiveSystem.ArchiveOperation
             }
             
             await Task.WhenAll(writeTasks);
+
             complete?.Invoke();
         }
 
-
-        public virtual void TryRecordKey(string groupKey, string dataKey)
+        public virtual void TryRecordKey(string groupKey)
         {
             if (AllGroupKeys != null)
             {
                 AllGroupKeys.Add(groupKey);
             }
 
-            ArchiveOperationHelper.RecordKey(_archiveID, groupKey, dataKey);
+            ArchiveOperationHelper.RecordKey(_archiveID, groupKey);
         }
 
         public string Read(string groupKey, string dataKey)
@@ -348,7 +366,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
             return await ArchiveOperationHelper.GetAllGroupKey();
         }
 
-        private string GetAndCombineDataFilePath(string groupKey)
+        protected string GetAndCombineDataFilePath(string groupKey)
         {
             string groupFilePath = DataArchiveConstData.GetAndCombineDataFilePath(Path, groupKey);
             return groupFilePath;
@@ -414,7 +432,19 @@ namespace FlexiArchiveSystem.ArchiveOperation
             }
 
             await Task.WhenAll(writeTasks);
-            ArchiveOperationHelper.RecordAllGroupKey(_archiveID, groupDataMap.Keys.ToList());
+            RecordAllGroupKeys();
+        }
+
+        protected virtual void RecordAllGroupKeys()
+        {
+            ArchiveOperationHelper.RecordAllGroupKeyWhenClone(_archiveID);
+        }
+
+        private CancellationTokenSource CreateCancelTokenSource(string filePath)
+        {
+            var source = new CancellationTokenSource();
+            WriteCancellationTokenSourceMap[filePath] = source;
+            return source;
         }
 
         public void Dispose()
@@ -423,6 +453,13 @@ namespace FlexiArchiveSystem.ArchiveOperation
             AllGroupKeys = null;
             archiveOperationHelper = null;
             IsActive = false;
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+        }
+        
+        public async Task DisposeAsync()
+        {
+            Dispose();
         }
     }
 }

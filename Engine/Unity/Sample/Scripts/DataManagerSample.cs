@@ -5,6 +5,7 @@
 //        email: yixiangluntan@163.com
 //-------------------------------------------------
 
+using FlexiArchiveSystem.Setting;
 using UnityEngine;
 
 namespace FlexiArchiveSystem.Sample
