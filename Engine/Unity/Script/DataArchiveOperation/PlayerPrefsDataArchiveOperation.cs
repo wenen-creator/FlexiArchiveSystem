@@ -20,6 +20,9 @@ namespace FlexiArchiveSystem.ArchiveOperation
     /// </summary>
     internal partial class PlayerPrefsDataArchiveOperation : IDataArchiveOperation
     {
+        private string _ArchiveSystemName;
+        public string ArchiveSystemName => _ArchiveSystemName;
+
         public bool IsValidation
         {
             get { return IsActive; }
@@ -48,14 +51,16 @@ namespace FlexiArchiveSystem.ArchiveOperation
 
         public void SetDataArchiveOperationHelper(DataArchiveOperationHelper helper)
         {
+            helper.Init(ArchiveSystemName);
             helper.SetArchiveID(_archiveID);
             archiveOperationHelper = helper;
         }
 
         private int _archiveID;
 
-        public async void Init(int archiveID)
+        public async void Init(string moudleName, int archiveID)
         {
+            _ArchiveSystemName = moudleName;
             SetArchiveID(archiveID);
             AllGroupKeys = await LoadAllGroupKeyFromDisk();
             IsActive = true;

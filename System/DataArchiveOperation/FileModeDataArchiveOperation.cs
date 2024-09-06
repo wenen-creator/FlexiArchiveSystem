@@ -22,6 +22,8 @@ namespace FlexiArchiveSystem.ArchiveOperation
     /// </summary>
     public class FileModeDataArchiveOperation : IDataArchiveOperation, ISetDataArchivePath, ICloneDataArchive
     {
+        private string _ArchiveSystemName;
+        public string ArchiveSystemName => _ArchiveSystemName;
         public bool IsValidation
         {
             get { return IsActive && Directory.Exists(Path); }
@@ -57,12 +59,14 @@ namespace FlexiArchiveSystem.ArchiveOperation
 
         public void SetDataArchiveOperationHelper(DataArchiveOperationHelper helper)
         {
+            helper.Init(ArchiveSystemName);
             helper.SetArchiveID(_archiveID);
             archiveOperationHelper = helper;
         }
 
-        public void Init(int archiveID)
+        public void Init(string moudleName,int archiveID)
         {
+            _ArchiveSystemName = moudleName;
             SetArchiveID(archiveID);
             groupDataMap = new Dictionary<string, JsonData>();
             IsActive = true;
@@ -255,9 +259,9 @@ namespace FlexiArchiveSystem.ArchiveOperation
 #pragma warning disable CS1998
         public virtual async Task DeleteAll()
         {
-            if (Directory.Exists(DataArchiveConstData.GetArchiveDirectoryPath(_archiveID)))
+            if (Directory.Exists(DataArchiveConstData.GetArchiveDirectoryPath(ArchiveSystemName, _archiveID)))
             {
-                Directory.Delete(DataArchiveConstData.GetArchiveDirectoryPath(_archiveID), true);
+                Directory.Delete(DataArchiveConstData.GetArchiveDirectoryPath(ArchiveSystemName, _archiveID), true);
             }
 
             TryRemoveAllGroupKey();

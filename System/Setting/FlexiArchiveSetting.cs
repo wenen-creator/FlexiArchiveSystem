@@ -22,6 +22,7 @@ namespace FlexiArchiveSystem.Setting
     {
         public ArchiveOperationType ArchiveOperationMode { get; }
         public bool IsLog { get; }
+        public abstract string ModuleName { get; }
         public bool IsAllowSaveDataSystemInfoInPlayerDevice { get; }
         public int CurrentArchiveID { get; }
         public List<int> AllArchiveID { get; }

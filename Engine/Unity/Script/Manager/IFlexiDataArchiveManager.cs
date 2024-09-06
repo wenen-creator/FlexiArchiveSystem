@@ -7,6 +7,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Reflection;
 using FlexiArchiveSystem.Assist;
 using FlexiArchiveSystem.Entry;
 using FlexiArchiveSystem.Setting;
@@ -58,6 +59,7 @@ namespace FlexiArchiveSystem
                 ArchiveSetting = UnityEngine.ScriptableObject.CreateInstance<FlexiArchiveSetting>();
                 
                 ArchiveSetting.ArchiveOperationMode = setting.ArchiveOperationMode;
+                ArchiveSetting.GetType().GetField("_ModuleName", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(ArchiveSetting, setting.ModuleName);
                 ArchiveSetting.hideFlags = UnityEngine.HideFlags.DontSave;
                 return;
             }

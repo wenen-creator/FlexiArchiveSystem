@@ -165,8 +165,8 @@ namespace FlexiArchiveSystem.Entry
                 var source = await iCloneDataArchive.GetSource();
                 var targetArchiveOperation = DataArchiveOperationFactory.CreateArchiveOperationObject(
                     _dataArchiveSetting.ArchiveOperationMode,
-                    nextArchiveID);
-                targetArchiveOperation.Init(nextArchiveID);
+                    _dataArchiveSetting.ModuleName, nextArchiveID);
+                targetArchiveOperation.Init(_dataArchiveSetting.ModuleName, nextArchiveID);
                 ICloneDataArchive target = targetArchiveOperation as ICloneDataArchive;
                 if (target != null)
                 {
@@ -201,9 +201,9 @@ namespace FlexiArchiveSystem.Entry
             var currentSystemInfoOperation = _dataArchiveSetting.DataTypeSystemInfoOperation;
             var source = await currentSystemInfoOperation.GetSource();
             var newSystemInfo = DataArchiveOperationFactory.CreateArchiveSystemInfoOperationObject(
-                _dataArchiveSetting.ArchiveOperationMode,
+                _dataArchiveSetting.ArchiveOperationMode, _dataArchiveSetting.ModuleName, 
                 nextArchiveID);
-            newSystemInfo.Init(nextArchiveID);
+            newSystemInfo.Init(_dataArchiveSetting.ModuleName, nextArchiveID);
             newSystemInfo.SetDataArchiveOperationHelper(currentSystemInfoOperation.ArchiveOperationHelper);
             await currentSystemInfoOperation.DisposeAsync();
             await newSystemInfo.CloneTo(source);

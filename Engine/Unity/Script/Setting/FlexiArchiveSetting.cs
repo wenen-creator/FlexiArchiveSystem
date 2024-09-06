@@ -33,14 +33,17 @@ namespace FlexiArchiveSystem.Setting
         [SerializeField] private bool _AllowSaveDataSystemInfo = false;
         public bool IsAllowSaveDataSystemInfoInPlayerDevice => _AllowSaveDataSystemInfo;
 
+        [Header("存档系统标识")]
+        [SerializeField] private string _ModuleName;
+        public string ModuleName => _ModuleName;
+        public string Name => name; //SO文件名
         public int CurrentArchiveID { get; private set; }
 
         [NonSerialized] private List<int> _AllArchiveID = null;
         public List<int> AllArchiveID => _AllArchiveID;
         public IDataArchiveOperation DataArchiveOperation { get; set; }
         public DataSystemInfoArchiveOperation DataTypeSystemInfoOperation { get; set; }
-        public string Name => name;
-        
+
         public void Init()
         {
             CurrentArchiveID = LoadCurrentArchiveIDFromDisk();
@@ -49,7 +52,7 @@ namespace FlexiArchiveSystem.Setting
 
         private int LoadCurrentArchiveIDFromDisk()
         {
-            return PlayerPrefs.GetInt(DataArchiveConstData.PREFS_KEY_CUR_ARCHIVE,
+            return PlayerPrefs.GetInt(DataArchiveConstData.GetPrefsKey_CUR_ARCHIVE(ModuleName),
                 DataArchiveConstData.DefaultStartArchiveID);
         }
 
@@ -69,15 +72,19 @@ namespace FlexiArchiveSystem.Setting
             RecordCurArchiveIDIntoMemory(CurrentArchiveID);
             if (isUpdateToDisk)
             {
-                PlayerPrefs.SetInt(DataArchiveConstData.PREFS_KEY_CUR_ARCHIVE, CurrentArchiveID);
+                PlayerPrefs.SetInt(DataArchiveConstData.GetPrefsKey_CUR_ARCHIVE(ModuleName), CurrentArchiveID);
             }
+        }
 
+        public void DeleteArchiveIDData()
+        {
+            PlayerPrefs.DeleteKey(DataArchiveConstData.GetPrefsKey_CUR_ARCHIVE(ModuleName));
         }
 
         public void RefreshArchiveOperation()
         {
             DataArchiveOperation.Dispose();
-            DataArchiveOperation.Init(CurrentArchiveID);
+            DataArchiveOperation.Init(ModuleName, CurrentArchiveID);
             RefreshArchiveSystemInfoOperation();
         }
 
@@ -96,14 +103,14 @@ namespace FlexiArchiveSystem.Setting
             }
 #endif
             DataTypeSystemInfoOperation.Dispose();
-            DataTypeSystemInfoOperation.Init(CurrentArchiveID);
+            DataTypeSystemInfoOperation.Init(ModuleName, CurrentArchiveID);
         }
 
         public void CreateOrRebuildArchiveOperation()
         {
             DataArchiveOperation =
-                DataArchiveOperationFactory.CreateArchiveOperationObject(archiveOperationType, CurrentArchiveID);
-            DataArchiveOperation.Init(CurrentArchiveID);
+                DataArchiveOperationFactory.CreateArchiveOperationObject(archiveOperationType,ModuleName, CurrentArchiveID);
+            DataArchiveOperation.Init(ModuleName,CurrentArchiveID);
             RebuildArchiveSystemInfoOperationInEditor();
         }
         
@@ -117,8 +124,8 @@ namespace FlexiArchiveSystem.Setting
 #endif
             DataTypeSystemInfoOperation =
                 DataArchiveOperationFactory.CreateArchiveSystemInfoOperationObject(archiveOperationType,
-                    CurrentArchiveID);
-            DataTypeSystemInfoOperation.Init(CurrentArchiveID);
+                    ModuleName, CurrentArchiveID);
+            DataTypeSystemInfoOperation.Init(ModuleName, CurrentArchiveID);
         }
 
         public List<int> GetAllArchiveID()
@@ -151,7 +158,7 @@ namespace FlexiArchiveSystem.Setting
             {
                 case ArchiveOperationType.FileMode:
                 case ArchiveOperationType.Sqlite:
-                    string archiveRootDirectoryPath = DataArchiveConstData.UserArchiveDirectoryPath;
+                    string archiveRootDirectoryPath = DataArchiveConstData.GetUserCertainArchiveSystemDirectoryPath(ModuleName);
                     if (Directory.Exists(archiveRootDirectoryPath) == false)
                     {
                         return null;

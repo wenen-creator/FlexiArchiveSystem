@@ -12,7 +12,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
     internal static class DataArchiveOperationFactory
     {
         public static IDataArchiveOperation CreateArchiveOperationObject(ArchiveOperationType operationType,
-            int archiveID)
+            string moduleName ,int archiveID)
         {
             IDataArchiveOperation dataArchiveOperation;
             switch (operationType)
@@ -36,20 +36,20 @@ namespace FlexiArchiveSystem.ArchiveOperation
             if (needSetPath)
             {
                 ISetDataArchivePath iSetDataArchivePath = dataArchiveOperation as ISetDataArchivePath;
-                iSetDataArchivePath.Path = DataArchiveConstData.GetArchiveDirectoryPath(archiveID);
+                iSetDataArchivePath.Path = DataArchiveConstData.GetArchiveDirectoryPath(moduleName, archiveID);
             }
 
             return dataArchiveOperation;
         }
 
         public static DataSystemInfoArchiveOperation CreateArchiveSystemInfoOperationObject(
-            ArchiveOperationType operationType, int archiveID)
+            ArchiveOperationType operationType,string moduleName, int archiveID)
         {
             var DataTypeSystemInfoOperation = new DataSystemInfoArchiveOperation();
             if (DataTypeSystemInfoOperation is ISetDataArchivePath)
             {
                 DataTypeSystemInfoOperation.SystemInfoPath =
-                    DataArchiveConstData.GetArchiveSystemInfoDirectoryPath(archiveID);
+                    DataArchiveConstData.GetArchiveSystemInfoDirectoryPath(moduleName, archiveID);
             }
 
             return DataTypeSystemInfoOperation;

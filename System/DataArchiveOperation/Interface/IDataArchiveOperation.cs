@@ -13,10 +13,11 @@ namespace FlexiArchiveSystem.ArchiveOperation
 {
     public interface IDataArchiveOperation : IDisposable
     {
+        public string ArchiveSystemName { get; } 
         public bool IsValidation { get; }
         public DataArchiveOperationHelper ArchiveOperationHelper { get; }
         public void SetDataArchiveOperationHelper(DataArchiveOperationHelper helper);
-        public void Init(int archiveID);
+        public void Init(string moudleName,int archiveID);
         public void SetArchiveID(int archiveID);
         public void DataPersistent(string groupKey, string dataKey, string dataStr);
         

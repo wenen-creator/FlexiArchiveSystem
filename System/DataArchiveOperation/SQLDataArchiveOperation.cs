@@ -21,6 +21,8 @@ namespace FlexiArchiveSystem.ArchiveOperation
 {
     internal class SQLDataArchiveOperation : IDataArchiveOperation, ISetDataArchivePath, ICloneDataArchive
     {
+        private string _ArchiveSystemName;
+        public string ArchiveSystemName => _ArchiveSystemName;
         public bool IsValidation
         {
             get { return IsActive && Directory.Exists(Path); }
@@ -62,12 +64,14 @@ namespace FlexiArchiveSystem.ArchiveOperation
 
         public void SetDataArchiveOperationHelper(DataArchiveOperationHelper helper)
         {
+            helper.Init(ArchiveSystemName);
             helper.SetArchiveID(_archiveID);
             archiveOperationHelper = helper;
         }
 
-        public void Init(int archiveID)
+        public void Init(string moudleName,int archiveID)
         {
+            _ArchiveSystemName = moudleName;
             SetArchiveID(archiveID);
             dataMap = new Dictionary<string, Dictionary<string, string>>();
             FilePath = GetAndCombineDataFilePath();

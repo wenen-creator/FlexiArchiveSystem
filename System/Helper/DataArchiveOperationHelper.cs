@@ -20,6 +20,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
 {
     public class DataArchiveOperationHelper
     {
+        private string _ArchiveSystemName;
         private List<string> GroupKeys;
         private JsonData groupKeysJsonData;
         private bool GroupKeysJsonDataIsDirty => groupKeysJsonData == null;
@@ -31,6 +32,11 @@ namespace FlexiArchiveSystem.ArchiveOperation
         public void SetArchiveID(int archiveID)
         {
             _archiveID = archiveID;
+        }
+
+        public void Init(string ArchiveSystemName)
+        {
+            _ArchiveSystemName = ArchiveSystemName;
         }
         
         public void RecordKey(int archiveID, string groupKey)
@@ -126,7 +132,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
 
         private void WriteToDisk(JsonData jsonData)
         {
-            using (StreamWriter streamWriter = new StreamWriter(DataArchiveConstData.GetArchiveGroupKeysFilePath(_archiveID)))
+            using (StreamWriter streamWriter = new StreamWriter(DataArchiveConstData.GetArchiveGroupKeysFilePath(_ArchiveSystemName, _archiveID)))
             {
                 streamWriter.AutoFlush = false;
                 streamWriter.Write(jsonData.ToJson());
@@ -143,7 +149,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
                 tokenSource.Dispose();
             }
 
-            string filePath = DataArchiveConstData.GetArchiveGroupKeysFilePath(_archiveID);
+            string filePath = DataArchiveConstData.GetArchiveGroupKeysFilePath(_ArchiveSystemName, _archiveID);
             bool isUse = await IOHelper.FileIsInUse(filePath, 300,100);
             if (isUse)
             {
@@ -170,7 +176,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
                 return groupKeysJsonData;
             }
 
-            string saveGroupPath = DataArchiveConstData.GetArchiveGroupKeysFilePath(_archiveID);
+            string saveGroupPath = DataArchiveConstData.GetArchiveGroupKeysFilePath(_ArchiveSystemName, _archiveID);
             
             groupKeysJsonData = JsonMapper.ToObject(await LoadGroupKeysFromDisk(saveGroupPath));
             return groupKeysJsonData;
@@ -197,7 +203,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
 
         public void DeleteAllGroupKeyFromDisk()
         {
-            string path = DataArchiveConstData.GetArchiveGroupKeysFilePath(_archiveID);
+            string path = DataArchiveConstData.GetArchiveGroupKeysFilePath(_ArchiveSystemName, _archiveID);
             if (File.Exists(path))
             {
                 File.Delete(path);

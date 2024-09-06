@@ -10,5 +10,6 @@ namespace FlexiArchiveSystem
     public static class Consts
     {
         public const string QueryArchiveToolPath = "Tools/FlexiArchive/DataMonitor";
+        public const string ClearAllArchiveToolPath = "Tools/FlexiArchive/ClearAllArchive";
     }
 }
