@@ -71,7 +71,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
         }
 
 
-        private void UpdateDirtyState(int archiveID)
+        public void UpdateDirtyState(int archiveID)
         {
             if (archiveID != _archiveID)
             {

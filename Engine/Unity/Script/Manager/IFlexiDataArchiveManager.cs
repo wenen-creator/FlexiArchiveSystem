@@ -6,6 +6,7 @@
 //-------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using FlexiArchiveSystem.Assist;
@@ -100,6 +101,27 @@ namespace FlexiArchiveSystem
         public DataGroup GetDataGroup(string groupKey)
         {
             return ArchiveContainer.GetDataGroup(groupKey);
+        }
+
+        public void SwitchArchiveID(int archiveID)
+        {
+            ArchiveSetting.SwitchArchive(archiveID);
+        }
+        
+        public int GetLastArchiveID()
+        {
+            List<int> ids = ArchiveSetting.GetAllArchiveID();
+            if (ids == null)
+            {
+                return ArchiveSetting.CurrentArchiveID;
+            }
+            return ids[ids.Count - 1];
+        }
+
+        
+        public void GetArchiveSystemInfo(int archiveID)
+        {
+            
         }
 
         public void Save() => ArchiveContainer.Save();

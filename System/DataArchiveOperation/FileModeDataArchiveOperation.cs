@@ -60,7 +60,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
         public void SetDataArchiveOperationHelper(DataArchiveOperationHelper helper)
         {
             helper.Init(ArchiveSystemName);
-            helper.SetArchiveID(_archiveID);
+            helper.UpdateDirtyState(_archiveID);
             archiveOperationHelper = helper;
         }
 

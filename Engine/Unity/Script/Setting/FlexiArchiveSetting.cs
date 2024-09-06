@@ -58,7 +58,13 @@ namespace FlexiArchiveSystem.Setting
 
         public int GetNextArchiveID()
         {
-            return CurrentArchiveID + 1;
+            GetAllArchiveID();
+            var nextArchiveID = CurrentArchiveID + 1;
+            while (_AllArchiveID.Contains(nextArchiveID))
+            {
+                nextArchiveID += 1;
+            }
+            return nextArchiveID;
         }
 
         public void SetArchiveID(int val, bool isUpdateToDisk = true)
@@ -85,13 +91,17 @@ namespace FlexiArchiveSystem.Setting
         {
             DataArchiveOperation.Dispose();
             DataArchiveOperation.Init(ModuleName, CurrentArchiveID);
+            DataArchiveOperation.SetDataArchiveOperationHelper(DataArchiveOperation.ArchiveOperationHelper);
             RefreshArchiveSystemInfoOperation();
         }
 
         public void SwitchArchive(int archiveID)
         {
-            SetArchiveID(archiveID);
-            RefreshArchiveOperation();
+            if (CurrentArchiveID != archiveID)
+            {
+                SetArchiveID(archiveID);
+                CreateOrRebuildArchiveOperation();   
+            }
         }
         
         public void RefreshArchiveSystemInfoOperation()
@@ -104,6 +114,7 @@ namespace FlexiArchiveSystem.Setting
 #endif
             DataTypeSystemInfoOperation.Dispose();
             DataTypeSystemInfoOperation.Init(ModuleName, CurrentArchiveID);
+            DataTypeSystemInfoOperation.SetDataArchiveOperationHelper(DataTypeSystemInfoOperation.ArchiveOperationHelper);
         }
 
         public void CreateOrRebuildArchiveOperation()
@@ -134,7 +145,7 @@ namespace FlexiArchiveSystem.Setting
             {
                 _AllArchiveID = GetAllArchiveIDFromDisk();
             }
-
+            
             return _AllArchiveID;
         }
 
@@ -192,7 +203,6 @@ namespace FlexiArchiveSystem.Setting
                 //sort
                 allArchiveID.Sort();
             }
-
             return allArchiveID;
         }
 

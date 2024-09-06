@@ -27,6 +27,7 @@ namespace FlexiArchiveSystem.Sample
 			DataArchiveConstData.USER_KEY = "Wenen";
 			DataManagerSample.instance.Init();
 			archiveManager = DataManagerSample.instance;
+			archiveID = archiveManager.GetLastArchiveID().ToString();
 		}
 
 		private string Demo1_WriteStr()
@@ -108,6 +109,12 @@ namespace FlexiArchiveSystem.Sample
 		{
 			archiveManager.InstantiateNewArchive();
 			Debug.Log(string.Format($"Clone New Archive From Current Archive "));
+		}
+		
+		private void SwitchArchive(int archiveID)
+		{
+			archiveManager.SwitchArchiveID(archiveID);
+			Debug.Log(string.Format($"Switch Archive {archiveID}"));
 		}
 	}
 }
