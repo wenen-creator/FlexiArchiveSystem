@@ -7,14 +7,17 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using FlexiArchiveSystem.Assist;
+using FlexiArchiveSystem.Setting;
 
 namespace FlexiArchiveSystem
 {
     public class DataGroup : IDisposable
     {
         public Dictionary<string, DataObject> dataObjectMap = new Dictionary<string, DataObject>();
-        private List<string> dirtyDataObjectList = new List<string>();
+        private List<string> dirtyDataObjectKeys = new List<string>();
         private string _groupKey;
         public event Action<string> OnDirtyHandler;
         private IArchiveSetting _ArchiveSetting;
@@ -24,7 +27,7 @@ namespace FlexiArchiveSystem
             _groupKey = groupKey;
         }
 
-        public void InjectArchiveSetting(IArchiveSetting setting)
+        internal void InjectArchiveSetting(IArchiveSetting setting)
         {
             _ArchiveSetting = setting;
         }
@@ -70,9 +73,9 @@ namespace FlexiArchiveSystem
 
         private void DataObjectHappenDirty(string key)
         {
-            if (dirtyDataObjectList.Contains(key) == false)
+            if (dirtyDataObjectKeys.Contains(key) == false)
             {
-                dirtyDataObjectList.Add(key);
+                dirtyDataObjectKeys.Add(key);
             }
 
             OnDirtyHandler?.Invoke(_groupKey);
@@ -86,18 +89,66 @@ namespace FlexiArchiveSystem
 
         public void Save()
         {
+            if (dirtyDataObjectKeys.Count == 0)
+            {
+                return;
+            }
+
+            var dirtyDataObjectList = dirtyDataObjectKeys.Select(GetCacheDataObject).ToArray();
+            _ArchiveSetting.DataArchiveOperation.DataPersistent(dirtyDataObjectList);
+            
             foreach (var dirtyDataObject in dirtyDataObjectList)
             {
-                DataObject dataObject = GetCacheDataObject(dirtyDataObject);
-                dataObject.Save();
+                dirtyDataObject._dataType.Refresh();
+                dirtyDataObject.TryToSaveDataSystemInfo();
+                dirtyDataObject.CleanDirty();
             }
-
-            if (dirtyDataObjectList.Count > 0 && _ArchiveSetting.IsLog)
+            
+            if (_ArchiveSetting.IsLog)
             {
-                Logger.LOG($"数据存档更新[{dirtyDataObjectList.Count}]条");
+                Logger.LOG($"数据存档更新 Group: [{_groupKey}] - [{dirtyDataObjectKeys.Count}]条");
             }
 
-            dirtyDataObjectList.Clear();
+            dirtyDataObjectKeys.Clear();
+        }
+        
+        public async Task SaveAsync(Action complete = null)
+        {
+            if (dirtyDataObjectKeys.Count == 0)
+            {
+                return;
+            }
+            
+            //TODO : cancel token
+            var dirtyDataObjectList = dirtyDataObjectKeys.Select(GetCacheDataObject).ToArray();
+            await _ArchiveSetting.DataArchiveOperation.DataPersistentAsync(complete, dirtyDataObjectList);
+            
+            foreach (var dirtyDataObject in dirtyDataObjectList)
+            {
+                dirtyDataObject._dataType.Refresh();
+                dirtyDataObject.CleanDirty();
+            }
+            TryToSaveSystemInfo(null, dirtyDataObjectList);
+            complete?.Invoke();
+           
+            if (_ArchiveSetting.IsLog)
+            {
+                Logger.LOG($"数据存档更新 Group: [{_groupKey}] - [{dirtyDataObjectKeys.Count}]条");
+            }
+
+            dirtyDataObjectKeys.Clear();
+        }
+        
+        private void TryToSaveSystemInfo(Action complete, params DataObject[] dataObjects)
+        {
+#if UNITY_EDITOR
+            _ArchiveSetting.DataTypeSystemInfoOperation.DataPersistentAsync(complete, dataObjects);
+#else
+         if (_ArchiveSetting.IsAllowSaveDataSystemInfoInPlayerDevice)
+         {
+            _ArchiveSetting.DataTypeSystemInfoOperation.DataPersistentAsync(complete, dataObjects);
+         }
+#endif
         }
 
         public void Dispose()
@@ -113,7 +164,7 @@ namespace FlexiArchiveSystem
                 dataObjectMap = null;
             }
 
-            dirtyDataObjectList = null;
+            dirtyDataObjectKeys = null;
             _groupKey = null;
             OnDirtyHandler = null;
         }

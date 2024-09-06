@@ -18,8 +18,11 @@ namespace FlexiArchiveSystem.ArchiveOperation
     /// Playerprefs注册表形式的存档方式
     /// notice: 出于性能考虑，因此该方式目前不支持多存档共存。
     /// </summary>
-    public partial class PlayerPrefsDataArchiveOperation : IDataArchiveOperation
+    internal partial class PlayerPrefsDataArchiveOperation : IDataArchiveOperation
     {
+        private string _ArchiveSystemName;
+        public string ArchiveSystemName => _ArchiveSystemName;
+
         public bool IsValidation
         {
             get { return IsActive; }
@@ -48,16 +51,18 @@ namespace FlexiArchiveSystem.ArchiveOperation
 
         public void SetDataArchiveOperationHelper(DataArchiveOperationHelper helper)
         {
-            helper.SetArchiveID(_archiveID);
+            helper.Init(ArchiveSystemName);
+            helper.UpdateDirtyState(_archiveID);
             archiveOperationHelper = helper;
         }
 
         private int _archiveID;
 
-        public void Init(int archiveID)
+        public async void Init(string moudleName, int archiveID)
         {
+            _ArchiveSystemName = moudleName;
             SetArchiveID(archiveID);
-            AllGroupKeys = LoadAllGroupKeyFromDisk();
+            AllGroupKeys = await LoadAllGroupKeyFromDisk();
             IsActive = true;
         }
 
@@ -66,11 +71,8 @@ namespace FlexiArchiveSystem.ArchiveOperation
             _archiveID = archiveID;
         }
 
-        public void DataPersistent(string key, string dataStr)
+        public void DataPersistent(string groupKey, string dataKey, string dataStr)
         {
-            var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(key);
-            string groupKey = keyTuple.Item1;
-            string dataKey = keyTuple.Item2;
 
             bool hasExistedBefore =TryGetJsonData(groupKey, out JsonData jsonData);
             bool isRewriteGroupKeys = hasExistedBefore == false;
@@ -78,15 +80,31 @@ namespace FlexiArchiveSystem.ArchiveOperation
             PlayerPrefs.SetString(DataArchiveConstData.GetGroupKeyInPlayerPrefs(groupKey), jsonData.ToJson());
             if (isRewriteGroupKeys)
             {
-                TryRecordKey(groupKey, dataKey);   
+                TryRecordKey(groupKey);   
             }
         }
 
-        public string Read(string key)
+        public void DataPersistent(params DataObject[] dataObjects)
         {
-            var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(key);
-            string groupKey = keyTuple.Item1;
-            string dataKey = keyTuple.Item2;
+            throw new NotImplementedException();
+        }
+
+#pragma warning disable CS1998
+        public async Task DataPersistentAsync(string groupKey, string dataKey, string dataStr, Action complete)
+        {
+            throw new NotImplementedException("PlayerPrefs does not support asynchronous saving");
+        }
+#pragma warning restore CS1998
+        
+#pragma warning disable CS1998
+        public async Task DataPersistentAsync(Action complete, params DataObject[] dataObjects)
+        {
+            throw new NotImplementedException("PlayerPrefs does not support asynchronous saving");
+        }
+#pragma warning restore CS1998
+        
+        public string Read(string groupKey, string dataKey)
+        {
             bool isGet = TryGetJsonData(groupKey, out JsonData jsonData);
 
             if (isGet == false)
@@ -117,7 +135,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
         {
             if (AllGroupKeys == null)
             {
-                AllGroupKeys = LoadAllGroupKeyFromDisk();
+                AllGroupKeys = await LoadAllGroupKeyFromDisk();
             }
 
             if (AllGroupKeys != null)
@@ -130,12 +148,9 @@ namespace FlexiArchiveSystem.ArchiveOperation
             TryRemoveAllGroupKey();
         }
 #pragma warning restore CS1998
-
-        public void Delete(string key)
+        
+        public void Delete(string groupKey, string dataKey)
         {
-            var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(key);
-            string groupKey = keyTuple.Item1;
-            string dataKey = keyTuple.Item2;
             bool isGet = TryGetJsonData(groupKey, out JsonData jsonData);
             if (isGet == false)
             {
@@ -157,13 +172,13 @@ namespace FlexiArchiveSystem.ArchiveOperation
             ArchiveOperationHelper.RemoveGroupKey(groupKey);
         }
 
-        public virtual void TryRecordKey(string groupKey, string dataKey)
+        public virtual void TryRecordKey(string groupKey)
         {
             if (AllGroupKeys != null)
             {
                 AllGroupKeys.Add(groupKey);
             }
-            ArchiveOperationHelper.RecordKey(_archiveID, groupKey, dataKey);
+            ArchiveOperationHelper.RecordKey(_archiveID, groupKey);
         }
 
         public void TryRemoveAllGroupKey()
@@ -171,9 +186,9 @@ namespace FlexiArchiveSystem.ArchiveOperation
             ArchiveOperationHelper.DeleteAllGroupKeyFromDisk();
         }
 
-        private List<string> LoadAllGroupKeyFromDisk()
+        private async Task<List<string>> LoadAllGroupKeyFromDisk()
         {
-            return ArchiveOperationHelper.GetAllGroupKey();
+            return await ArchiveOperationHelper.GetAllGroupKey();
         }
 
         private bool TryGetJsonData(string groupKey, out JsonData jsonData)
@@ -212,6 +227,11 @@ namespace FlexiArchiveSystem.ArchiveOperation
             AllGroupKeys = null;
             groupDataMap = null;
             IsActive = false;
+        }
+
+        public async Task DisposeAsync()
+        {
+            Dispose();
         }
     }
 }

@@ -10,6 +10,6 @@ namespace FlexiArchiveSystem.Assist
     /// <summary>
     /// Please go to Unity-Logger what is core code;
     /// </summary>
-    internal static partial class Logger  { }
+    public static partial class Logger  { }
     
 }

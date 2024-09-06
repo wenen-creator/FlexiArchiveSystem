@@ -27,6 +27,7 @@ namespace FlexiArchiveSystem.Sample
 			DataArchiveConstData.USER_KEY = "Wenen";
 			DataManagerSample.instance.Init();
 			archiveManager = DataManagerSample.instance;
+			archiveID = archiveManager.GetLastArchiveID().ToString();
 		}
 
 		private string Demo1_WriteStr()
@@ -84,10 +85,18 @@ namespace FlexiArchiveSystem.Sample
 			return dataVector2.DiskData.ToString();
 		}
 
-		private void Demo7_SavePoint()
+		private void Demo7_SavePoint(bool isAsync)
 		{
 			Debug.Log(string.Format($"save archive"));
-			archiveManager.Save();
+			if (isAsync)
+			{
+				archiveManager.SaveAsync(() => { Debug.Log("async save successfully");});
+			}
+			else
+			{
+				archiveManager.Save();
+				Debug.Log("save successfully");
+			}
 		}
 
 		private void Demo_DeleteCurrentArchive()
@@ -100,6 +109,12 @@ namespace FlexiArchiveSystem.Sample
 		{
 			archiveManager.InstantiateNewArchive();
 			Debug.Log(string.Format($"Clone New Archive From Current Archive "));
+		}
+		
+		private void SwitchArchive(int archiveID)
+		{
+			archiveManager.SwitchArchiveID(archiveID);
+			Debug.Log(string.Format($"Switch Archive {archiveID}"));
 		}
 	}
 }

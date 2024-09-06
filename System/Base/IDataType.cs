@@ -12,8 +12,9 @@ namespace FlexiArchiveSystem
     public interface IDataType
     {
         public event Action OnDirtyHandler;
-        public event Action<string, DataTypeSystemInfo> OnPersistentHandler;
-        public void ToPersistent();
+        public DataTypeSystemInfo SystemInfo { get; }
+        public void Refresh();
+        public string Serialize();
         public void Reset();
         public string ToString();
 

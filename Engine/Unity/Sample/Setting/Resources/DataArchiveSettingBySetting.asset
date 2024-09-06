@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5e9c44cf00e94936b33fcacf7af5bbe1, type: 3}
-  m_Name: DataArchiveSettingByGameplay
+  m_Name: DataArchiveSettingBySetting
   m_EditorClassIdentifier: 
-  archiveOperationType: 2
+  archiveOperationType: 0
   isLog: 1
   _AllowSaveDataSystemInfo: 0
-  _ModuleName: GamePlay
+  _ModuleName: Setting

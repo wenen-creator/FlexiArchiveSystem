@@ -6,6 +6,7 @@
 //-------------------------------------------------
 
 using UnityEngine;
+using Logger = FlexiArchiveSystem.Assist.Logger;
 
 namespace FlexiArchiveSystem.Sample
 {
@@ -14,6 +15,8 @@ namespace FlexiArchiveSystem.Sample
 	{
 		private string write_str;
 		private string read_str;
+		private bool isAsync = true;
+		private string archiveID;
 		void OnGUI()
 		{
 			GUI.Label(new Rect(Screen.width/2 - 65,Screen.height - 90,130,50),"Flexi Archive System");
@@ -65,6 +68,7 @@ namespace FlexiArchiveSystem.Sample
 			var groupy = (screenHeight - groundHeight) / 2;
 			GUI.BeginGroup(new Rect(groupx, groupy, groundWidth, groundHeight));
 			GUI.Box(new Rect(0, 0, groundWidth, groundHeight), "Select");
+			isAsync = GUI.Toggle(new Rect(groundWidth - 80, 2, 80, 30),isAsync, "IsAsync");
 			if (GUI.Button(new Rect(10, 30, 120, 30), "1.write(1-1)"))
 			{
 				write_str = Demo1_WriteStr();
@@ -97,7 +101,7 @@ namespace FlexiArchiveSystem.Sample
 
 			if (GUI.Button(new Rect(270, 30, 120, 30), "7.save"))
 			{
-				Demo7_SavePoint();
+				Demo7_SavePoint(isAsync);
 			}
 
 			if (GUI.Button(new Rect(270, 70, 120, 30), "8.DeleteAll"))
@@ -109,7 +113,27 @@ namespace FlexiArchiveSystem.Sample
 			{
 				CloneArchive();
 			}
+			GUI.EndGroup();
+			GUI.BeginGroup(new Rect((screenWidth - 200) / 2, groupy + groundHeight + 50, 200, 50));
+	
+			string lastArchiveID = archiveID;
+			string curID = archiveManager.ArchiveSetting.CurrentArchiveID.ToString();
+			if (lastArchiveID != curID)
+			{
+				lastArchiveID = curID;
+			}
+			archiveID = GUI.TextField(new Rect(40, 0, 120, 20), lastArchiveID);
+			GUI.Label(new Rect(50, 25, 120, 20), "Switch Archive");
+			if (int.TryParse(archiveID, out var value) == false)
+			{
+				Logger.LOG_ERROR("请输入存档ID数字");
+				archiveID = lastArchiveID;
+			}
 
+			if (string.Equals(lastArchiveID, archiveID) == false)
+			{
+				SwitchArchive(int.Parse(archiveID));
+			}
 			GUI.EndGroup();
 		}
 	}

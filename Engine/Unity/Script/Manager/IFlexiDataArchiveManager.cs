@@ -6,9 +6,12 @@
 //-------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection;
 using FlexiArchiveSystem.Assist;
 using FlexiArchiveSystem.Entry;
+using FlexiArchiveSystem.Setting;
 using UnityEngine;
 
 namespace FlexiArchiveSystem
@@ -30,7 +33,6 @@ namespace FlexiArchiveSystem
                 return;
             }
             SetDataArchiveSetting(settingInfo.ArchiveSetting as FlexiArchiveSetting);
-            SetDataArchiveSettingName(settingInfo.SettingName);
             InitDataArchiveSetting();
             InitDataArchiveContainer();
             ArchiveManagerRegister.instance.Register(this);
@@ -57,16 +59,12 @@ namespace FlexiArchiveSystem
                 ArchiveSetting = UnityEngine.ScriptableObject.CreateInstance<FlexiArchiveSetting>();
                 
                 ArchiveSetting.ArchiveOperationMode = setting.ArchiveOperationMode;
+                ArchiveSetting.GetType().GetField("_ModuleName", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(ArchiveSetting, setting.ModuleName);
                 ArchiveSetting.hideFlags = UnityEngine.HideFlags.DontSave;
                 return;
             }
 #endif
             ArchiveSetting = setting;
-        }
-
-        private void SetDataArchiveSettingName(string settingName)
-        {
-            ArchiveSetting.name = settingName;
         }
 
         public void InitDataArchiveSetting()
@@ -99,9 +97,36 @@ namespace FlexiArchiveSystem
             return ArchiveContainer.GetDataGroup(groupKey);
         }
 
-        public void Save()
+        public void SwitchArchiveID(int archiveID) => ArchiveContainer.SwitchArchive(archiveID);
+
+        public int GetLastArchiveID()
         {
-            ArchiveContainer.Save();
+            List<int> ids = ArchiveSetting.GetAllArchiveID();
+            if (ids == null)
+            {
+                return ArchiveSetting.CurrentArchiveID;
+            }
+            return ids[ids.Count - 1];
+        }
+
+        
+        public FlexiArchiveSystemInfo GetArchiveSystemInfo(int archiveID)
+        {
+            return default(FlexiArchiveSystemInfo);
+        }
+
+        public void Save() => ArchiveContainer.Save();
+
+        public void SaveAsync(Action complete = null) => ArchiveContainer.SaveAsync(complete);
+
+        public void SaveGroup(string group_key)
+        {
+            ArchiveContainer.SaveGroup(group_key);
+        }
+        
+        public void SaveGroup(params string[] groups)
+        {
+            ArchiveContainer.SaveGroup(groups);
         }
 
         public void Delete(string groupKey, string dataKey)
@@ -117,16 +142,7 @@ namespace FlexiArchiveSystem
 
         public void ClearMemoryCache() => ArchiveContainer.ClearMemoryCache();
 
-        public virtual void Dispose()
-        {
-            if (ArchiveSetting != null)
-            {
-#if !UNITY_EDITOR
-            UnityEngine.ScriptableObject.DestroyImmediate(ArchiveSetting);
-#endif
-                ArchiveSetting = null;
-            }
-        }
+        public virtual void Dispose() { }
 
         private void OnApplicationQuit()
         {
@@ -139,7 +155,14 @@ namespace FlexiArchiveSystem
             {
                 ArchiveSetting.DataArchiveOperation?.Dispose();
                 ArchiveSetting.DataTypeSystemInfoOperation?.Dispose();
+                if (Application.isPlaying)
+                {
+                    ArchiveSetting.Dispose();
+                }
+                ArchiveSetting = null;
             }
+
+            Dispose();
 
             GC.Collect();
             GC.WaitForPendingFinalizers();

@@ -6,6 +6,7 @@
 //-------------------------------------------------
 
 using System.Collections.Generic;
+using FlexiArchiveSystem.Setting;
 
 namespace FlexiArchiveSystem.Assist
 {
@@ -13,39 +14,34 @@ namespace FlexiArchiveSystem.Assist
     {
         public static ArchiveManagerRegister instance = new ArchiveManagerRegister();
 
-        private List<IFlexiDataArchiveManager> ArchiveMgrCollections = new List<IFlexiDataArchiveManager>();
+        private Dictionary<string, IFlexiDataArchiveManager> ArchiveMgrMap = new Dictionary<string, IFlexiDataArchiveManager>();
 
         public void Register(IFlexiDataArchiveManager mgr)
         {
-            if (ArchiveMgrCollections.Contains(mgr) == false)
+            string ModuleName = mgr.ArchiveSetting.ModuleName;
+            if (string.IsNullOrEmpty(ModuleName))
             {
-                ArchiveMgrCollections.Add(mgr);
+                Logger.LOG_ERROR("存档系统的 ModuleName 不能为空");
+                return;
             }
+            ArchiveMgrMap[ModuleName] = mgr;
         }
         
         public void RemoveRegister(IFlexiDataArchiveManager mgr)
         {
-            if (ArchiveMgrCollections.Contains(mgr))
+            string ModuleName = mgr.ArchiveSetting.ModuleName;
+            if (ArchiveMgrMap.ContainsKey(ModuleName) == false)
             {
-                ArchiveMgrCollections.Remove(mgr);
+                return;
             }
+
+            ArchiveMgrMap.Remove(ModuleName);
         }
 
         public IFlexiDataArchiveManager FindByArchiveSetting(IArchiveSetting archiveSetting)
         {
-            for (int i = 0; i < ArchiveMgrCollections.Count; i++)
-            {
-                if (ArchiveMgrCollections[i].ArchiveSetting == null)
-                {
-                    continue;
-                }
-                if (ArchiveMgrCollections[i].ArchiveSetting.name == archiveSetting.Name)
-                {
-                    return ArchiveMgrCollections[i];
-                }
-            }
-
-            return null;
+            ArchiveMgrMap.TryGetValue(archiveSetting.ModuleName, out var mgr);
+            return mgr;
         }
     }
 }

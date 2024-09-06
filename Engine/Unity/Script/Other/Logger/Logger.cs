@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace FlexiArchiveSystem.Assist
 {
-    internal static partial class Logger
+    public static partial class Logger
     {
         public static void LOG_ERROR(string log)
         {

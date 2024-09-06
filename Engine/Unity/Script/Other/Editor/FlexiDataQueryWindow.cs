@@ -11,8 +11,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using FlexiArchiveSystem.Assist;
+using FlexiArchiveSystem.Setting;
 using UnityEditor;
 using UnityEngine;
+using Logger = FlexiArchiveSystem.Assist.Logger;
 using Object = UnityEngine.Object;
 
 namespace FlexiArchiveSystem.U3DEditor
@@ -43,7 +45,7 @@ namespace FlexiArchiveSystem.U3DEditor
         bool _foldoutValue;
         public Object field_archiveSetting;
 
-        [MenuItem(Consts.QueryArchiveToolPath)]
+        [MenuItem(Consts.QueryArchiveToolPath, false ,-100)]
         public static void ShowWindow()
         {
             _window = EditorWindow.GetWindow(typeof(FlexiDataQueryWindow),false,"Flexi-ArchiveMonitor") as FlexiDataQueryWindow;
@@ -183,7 +185,7 @@ namespace FlexiArchiveSystem.U3DEditor
             {
                 EditorGUILayout.Space(1, false);
                 GUILayout.Label("选择存档:", GUILayout.Width(60));
-                EditorGUI.BeginDisabledGroup(Application.isPlaying);
+                EditorGUI.BeginDisabledGroup(Application.isPlaying || DataArchiveSetting == null);
                 if (EditorGUILayout.DropdownButton(new GUIContent(DataArchiveConstData.GetArchiveKey(selectArchiveID)),
                         FocusType.Keyboard,
                         GUILayout.Width(position.width * 0.4f)))
@@ -271,7 +273,7 @@ namespace FlexiArchiveSystem.U3DEditor
 
                     EditorGUILayout.LabelField(new GUIContent("Type: "), GUILayout.Width(40));
                     EditorGUILayout.LabelField(pair.Value.resultType, GUI.skin.box,
-                        GUILayout.Width(CalculateTypeDesWidth(pair.Value.resultType)), GUILayout.Height(22));
+                        GUILayout.Width(position.width * 0.1f), GUILayout.Height(22));
                     EditorGUILayout.Space(1);
                     if (GUILayout.Button("Detail", GUILayout.ExpandWidth(true)))
                     {
@@ -314,16 +316,33 @@ namespace FlexiArchiveSystem.U3DEditor
                 SetResult(fullKey, result);
                 AddMonitor(dataObject);
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 isQueryError = true;
+                Assist.Logger.LOG_ERROR(e.Message);
             }
 
         }
 
         private ResultWrapper QueryResult(DataObject dataObject, string fullKey)
         {
-            Type dataTypeSystemType = DataArchiveSetting.DataTypeSystemInfoOperation.GetTypeOfDataValue(fullKey);
+            var keyTuple = DataKeyHandler.GetAndProcessKeyCollection(fullKey);
+            string groupKey = keyTuple.Item1;
+            string dataKey = keyTuple.Item2;
+            Type dataTypeSystemType = null;
+            try
+            {
+                dataTypeSystemType = DataArchiveSetting.DataTypeSystemInfoOperation.GetTypeOfDataValue(groupKey, dataKey);
+                if (dataTypeSystemType == null)
+                {
+                    Logger.LOG_ERROR("SystemInfo信息缺失");
+                }
+            }
+            catch (Exception)
+            {
+                Logger.LOG_ERROR("获取SystemInfo出错");
+            }
+            
             Type valueType = dataTypeSystemType.BaseType.GetGenericArguments()[0];
             var methodInfo_GetData = dataObject.GetType().GetMethod("GetData");
             methodInfo_GetData = methodInfo_GetData.MakeGenericMethod(dataTypeSystemType);
@@ -398,11 +417,6 @@ namespace FlexiArchiveSystem.U3DEditor
             DataObject dataObject = DataArchiveManager.GetDataObject(keyCollection.Item1, keyCollection.Item2);
             RemoveMonitor(dataObject);
             removeResultQueue.Enqueue(key);
-        }
-
-        private float CalculateTypeDesWidth(string des)
-        {
-            return des.Length * 8;
         }
 
         private void SelectArchiveIDItem(int index)

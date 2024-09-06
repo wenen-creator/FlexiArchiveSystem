@@ -13,7 +13,6 @@ namespace FlexiArchiveSystem
     {
         private static string AUTHOR { get; set; } = "温文";
         public static string USER_KEY { get; set; } = "Wenen";
-        public static string PREFS_KEY_CUR_ARCHIVE { get; private set; } = USER_KEY + "CurArchID";
         public const string Prefix_ArchiveIDKey = "ArchiveID";
         private static string _ArchiveRootDirectoryPath;
 
@@ -45,9 +44,14 @@ namespace FlexiArchiveSystem
             }
         }
 
+        public static string GetUserCertainArchiveSystemDirectoryPath(string MoudleName)
+        {
+             return Path.Combine(UserArchiveDirectoryPath, MoudleName);
+        }
+
         public static string GetAndCombineDataFilePath(string path, string groupKey)
         {
-            string groupFilePath = System.IO.Path.Combine(path, string.Format("{0}.{1}", groupKey, "archive"));
+            string groupFilePath = Path.Combine(path, string.Format("{0}.{1}", groupKey, "archive"));
             return groupFilePath;
         }
 
@@ -58,24 +62,29 @@ namespace FlexiArchiveSystem
             return string.Format("{0}{1}", Prefix_ArchiveIDKey, archiveID);
         }
 
-        public static string GetArchiveDirectoryPath(int archiveID)
+        public static string GetArchiveDirectoryPath(string ModuleName, int archiveID)
         {
-            return Path.Combine(UserArchiveDirectoryPath, GetArchiveKey(archiveID));
+            return Path.Combine(GetUserCertainArchiveSystemDirectoryPath(ModuleName), GetArchiveKey(archiveID));
         }
 
-        public static string GetArchiveSystemInfoDirectoryPath(int archiveID)
+        public static string GetArchiveSystemInfoDirectoryPath(string ModuleName, int archiveID)
         {
-            return Path.Combine(UserArchiveDirectoryPath, GetArchiveKey(archiveID), "DataTypeSystemInfo");
+            return Path.Combine(GetUserCertainArchiveSystemDirectoryPath(ModuleName), GetArchiveKey(archiveID), "DataTypeSystemInfo");
         }
 
-        public static string GetArchiveGroupKeysFilePath(int archiveID)
+        public static string GetArchiveGroupKeysFilePath(string ModuleName, int archiveID)
         {
-            return Path.Combine(GetArchiveDirectoryPath(archiveID), "groups.key");
+            return Path.Combine(GetArchiveDirectoryPath(ModuleName, archiveID), "groups.key");
         }
 
         public static string GetGroupKeyInPlayerPrefs(string groupKey)
         {
             return string.Format($"{USER_KEY}_{groupKey}");
+        }
+
+        public static string GetPrefsKey_CUR_ARCHIVE(string moduleName)
+        {
+            return USER_KEY + moduleName +"CurArchID";
         }
     }
 }

@@ -5,14 +5,12 @@
 //        email: yixiangluntan@163.com
 //-------------------------------------------------
 
-namespace FlexiArchiveSystem.ArchiveOperation
+using System;
+
+namespace FlexiArchiveSystem
 {
-    /// <summary>
-    /// Please go to Unity-PlayerPrefsDataArchiveOperation what is core code;
-    /// </summary>
-    internal partial class PlayerPrefsDataArchiveOperation
+    public struct FlexiArchiveSystemInfo
     {
-        
+        public DateTime Create_Time;
     }
 }
-

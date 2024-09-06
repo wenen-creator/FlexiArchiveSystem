@@ -5,17 +5,18 @@
 //        email: yixiangluntan@163.com
 //-------------------------------------------------
 
-using FlexiArchiveSystem.Setting;
+using System.Threading;
+using UnityEngine;
+using Logger = FlexiArchiveSystem.Assist.Logger;
 
 namespace FlexiArchiveSystem
 {
-    public struct ArchiveSettingWrapper
+    public static class FlexiArchiveSystemInitializer
     {
-        public readonly IArchiveSetting ArchiveSetting;
-
-        public ArchiveSettingWrapper(IArchiveSetting setting)
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        static void Init()
         {
-            ArchiveSetting = setting;
+            
         }
     }
 }

@@ -5,6 +5,7 @@
 //        email: yixiangluntan@163.com
 //-------------------------------------------------
 
+using FlexiArchiveSystem.Setting;
 using UnityEngine;
 
 namespace FlexiArchiveSystem.Sample
@@ -15,13 +16,7 @@ namespace FlexiArchiveSystem.Sample
 
         protected override ArchiveSettingWrapper LoadDataArchiveSettingFromDisk()
         {
-            return new ArchiveSettingWrapper("DataArchiveSettingByGameplay",
-                Resources.Load<FlexiArchiveSetting>("DataArchiveSettingByGameplay"));
-        }
-
-        static DataManagerSample()
-        {
-            Debug.Log("test");
+            return new ArchiveSettingWrapper(Resources.Load<FlexiArchiveSetting>("DataArchiveSettingByGameplay"));
         }
     }
 }

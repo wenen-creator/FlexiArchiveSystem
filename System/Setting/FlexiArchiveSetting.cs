@@ -8,7 +8,7 @@
 using System.Collections.Generic;
 using FlexiArchiveSystem.ArchiveOperation;
 
-namespace FlexiArchiveSystem
+namespace FlexiArchiveSystem.Setting
 {
     /// <summary>
     /// Please go to Unity-FlexiArchiveSetting what is core code;
@@ -22,11 +22,12 @@ namespace FlexiArchiveSystem
     {
         public ArchiveOperationType ArchiveOperationMode { get; }
         public bool IsLog { get; }
+        public abstract string ModuleName { get; }
+        public bool IsAllowSaveDataSystemInfoInPlayerDevice { get; }
         public int CurrentArchiveID { get; }
         public List<int> AllArchiveID { get; }
         public IDataArchiveOperation DataArchiveOperation { get; set; }
         public DataSystemInfoArchiveOperation DataTypeSystemInfoOperation { get; set; }
-        public string Name { get; }
         public void Init();
         public int GetNextArchiveID();
         public void SetArchiveID(int val, bool isUpdateToDisk = true);

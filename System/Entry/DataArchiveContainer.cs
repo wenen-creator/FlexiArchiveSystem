@@ -8,8 +8,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using FlexiArchiveSystem.ArchiveOperation;
 using FlexiArchiveSystem.Assist;
+using FlexiArchiveSystem.Setting;
 
 namespace FlexiArchiveSystem.Entry
 {
@@ -19,7 +21,7 @@ namespace FlexiArchiveSystem.Entry
         public List<string> dirtyDataGroupList = new List<string>();
         private IArchiveSetting _dataArchiveSetting;
 
-        public DataArchiveContainer(IArchiveSetting dataArchiveSetting)
+        internal DataArchiveContainer(IArchiveSetting dataArchiveSetting)
         {
             this._dataArchiveSetting = dataArchiveSetting;
         }
@@ -64,6 +66,15 @@ namespace FlexiArchiveSystem.Entry
             }
         }
 
+        public void SwitchArchive(int archiveID)
+        {
+            if (archiveID != _dataArchiveSetting.CurrentArchiveID)
+            {
+                _dataArchiveSetting.SwitchArchive(archiveID);
+                ClearMemoryCache();
+            }
+        }
+
         public void Save()
         {
             foreach (var dirtyDataGroup in dirtyDataGroupList)
@@ -74,6 +85,53 @@ namespace FlexiArchiveSystem.Entry
 
             dirtyDataGroupList.Clear();
         }
+        
+        public async void SaveAsync(Action allComplete)
+        {
+            //TODO : cancel token
+            IList<Task> saveList = new List<Task>();
+            foreach (var dirtyDataGroup in dirtyDataGroupList)
+            {
+                DataGroup dataGroupObject = GetCacheDataGroup(dirtyDataGroup);
+                saveList.Add(dataGroupObject.SaveAsync());
+            }
+            await Task.WhenAll(saveList);
+            allComplete?.Invoke();
+            dirtyDataGroupList.Clear();
+        }
+        
+        public void SaveGroup(string group_key)
+        {
+            int index = dirtyDataGroupList.IndexOf(group_key);
+            if (index < 0)
+            {
+                return;
+            }
+            var groupObject = GetCacheDataGroup(group_key);
+            if (groupObject != null)
+            {
+                groupObject.Save();
+                dirtyDataGroupList.RemoveAt(index);
+            }
+        }
+        
+        public void SaveGroup(params string[] group_keys)
+        {
+            foreach (var group_key in group_keys)
+            {
+                int index = dirtyDataGroupList.IndexOf(group_key);
+                if (index < 0)
+                {
+                    continue;
+                }
+                var groupObject = GetCacheDataGroup(group_key);
+                if (groupObject != null)
+                {
+                    groupObject.Save();
+                    dirtyDataGroupList.RemoveAt(index);
+                }
+            }
+        }
 
         public void Delete(string group_key, string data_key)
         {
@@ -83,13 +141,22 @@ namespace FlexiArchiveSystem.Entry
 
         public async void DeleteAll()
         {
+#if !UNITY_EDITOR
+                if (_dataArchiveSetting.IsAllowSaveDataSystemInfoInPlayerDevice)
+                {
+                    await _dataArchiveSetting.DataTypeSystemInfoOperation.DeleteAll();
+                }
+#else
             await _dataArchiveSetting.DataTypeSystemInfoOperation.DeleteAll();
+#endif
+
             await _dataArchiveSetting.DataArchiveOperation.DeleteAll();
+            
             _dataArchiveSetting.RefreshArchiveOperation();
             ClearMemoryCache();
         }
 
-        public void InstantiateNewArchive()
+        public async void InstantiateNewArchive(Action complete = null)
         {
             int nextArchiveID = _dataArchiveSetting.GetNextArchiveID();
             //Clone
@@ -104,17 +171,21 @@ namespace FlexiArchiveSystem.Entry
             IDataArchiveOperation newDataArchiveOperation = null;
             if (currentDataArchiveOperation is ICloneDataArchive iCloneDataArchive)
             {
-                var source = iCloneDataArchive.GetSource();
+                var source = await iCloneDataArchive.GetSource();
                 var targetArchiveOperation = DataArchiveOperationFactory.CreateArchiveOperationObject(
                     _dataArchiveSetting.ArchiveOperationMode,
-                    nextArchiveID);
-                targetArchiveOperation.Init(nextArchiveID);
+                    _dataArchiveSetting.ModuleName, nextArchiveID);
+                targetArchiveOperation.Init(_dataArchiveSetting.ModuleName, nextArchiveID);
                 ICloneDataArchive target = targetArchiveOperation as ICloneDataArchive;
-                targetArchiveOperation.SetDataArchiveOperationHelper(currentDataArchiveOperation
-                    .ArchiveOperationHelper);
-                target.CloneTo(source);
-                newDataArchiveOperation = target as IDataArchiveOperation;
-                CreateNewSystemInfoCoupleWithArchive(nextArchiveID);
+                if (target != null)
+                {
+                    targetArchiveOperation.SetDataArchiveOperationHelper(currentDataArchiveOperation
+                        .ArchiveOperationHelper);
+                    await currentDataArchiveOperation.DisposeAsync();
+                    await target.CloneTo(source);
+                    newDataArchiveOperation = target as IDataArchiveOperation;
+                    await CreateNewSystemInfoCoupleWithArchive(nextArchiveID);
+                }
             }
             else
             {
@@ -122,22 +193,29 @@ namespace FlexiArchiveSystem.Entry
             }
 
             _dataArchiveSetting.DataArchiveOperation = newDataArchiveOperation;
-            currentDataArchiveOperation.Dispose();
             _dataArchiveSetting.SetArchiveID(nextArchiveID);
             if (_dataArchiveSetting.IsLog) Logger.LOG("克隆存档成功");
+            complete?.Invoke();
         }
-
-        [Conditional("UNITY_EDITOR")]
-        private void CreateNewSystemInfoCoupleWithArchive(int nextArchiveID)
+        
+        private async Task CreateNewSystemInfoCoupleWithArchive(int nextArchiveID)
         {
+#if !UNITY_EDITOR
+            if (_dataArchiveSetting.IsAllowSaveDataSystemInfoInPlayerDevice == false)
+            {
+                Logger.LOG("不允许保存SystemInfo");
+                return;
+            }
+#endif
             var currentSystemInfoOperation = _dataArchiveSetting.DataTypeSystemInfoOperation;
-            var source = currentSystemInfoOperation.GetSource();
+            var source = await currentSystemInfoOperation.GetSource();
             var newSystemInfo = DataArchiveOperationFactory.CreateArchiveSystemInfoOperationObject(
-                _dataArchiveSetting.ArchiveOperationMode,
+                _dataArchiveSetting.ArchiveOperationMode, _dataArchiveSetting.ModuleName, 
                 nextArchiveID);
-            newSystemInfo.Init(nextArchiveID);
+            newSystemInfo.Init(_dataArchiveSetting.ModuleName, nextArchiveID);
             newSystemInfo.SetDataArchiveOperationHelper(currentSystemInfoOperation.ArchiveOperationHelper);
-            newSystemInfo.CloneTo(source);
+            await currentSystemInfoOperation.DisposeAsync();
+            await newSystemInfo.CloneTo(source);
             _dataArchiveSetting.DataTypeSystemInfoOperation = newSystemInfo;
         }
 
