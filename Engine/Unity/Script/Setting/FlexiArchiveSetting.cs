@@ -97,11 +97,9 @@ namespace FlexiArchiveSystem.Setting
 
         public void SwitchArchive(int archiveID)
         {
-            if (CurrentArchiveID != archiveID)
-            {
-                SetArchiveID(archiveID);
-                CreateOrRebuildArchiveOperation();   
-            }
+            // if (CurrentArchiveID != archiveID) { }
+            SetArchiveID(archiveID);
+            CreateOrRebuildArchiveOperation();   
         }
         
         public void RefreshArchiveSystemInfoOperation()

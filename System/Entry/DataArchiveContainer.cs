@@ -66,6 +66,15 @@ namespace FlexiArchiveSystem.Entry
             }
         }
 
+        public void SwitchArchive(int archiveID)
+        {
+            if (archiveID != _dataArchiveSetting.CurrentArchiveID)
+            {
+                _dataArchiveSetting.SwitchArchive(archiveID);
+                ClearMemoryCache();
+            }
+        }
+
         public void Save()
         {
             foreach (var dirtyDataGroup in dirtyDataGroupList)

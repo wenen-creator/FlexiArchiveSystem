@@ -103,11 +103,8 @@ namespace FlexiArchiveSystem
             return ArchiveContainer.GetDataGroup(groupKey);
         }
 
-        public void SwitchArchiveID(int archiveID)
-        {
-            ArchiveSetting.SwitchArchive(archiveID);
-        }
-        
+        public void SwitchArchiveID(int archiveID) => ArchiveContainer.SwitchArchive(archiveID);
+
         public int GetLastArchiveID()
         {
             List<int> ids = ArchiveSetting.GetAllArchiveID();
@@ -119,9 +116,9 @@ namespace FlexiArchiveSystem
         }
 
         
-        public void GetArchiveSystemInfo(int archiveID)
+        public FlexiArchiveSystemInfo GetArchiveSystemInfo(int archiveID)
         {
-            
+            return default(FlexiArchiveSystemInfo);
         }
 
         public void Save() => ArchiveContainer.Save();
