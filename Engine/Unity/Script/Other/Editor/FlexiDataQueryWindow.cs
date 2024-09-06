@@ -45,7 +45,7 @@ namespace FlexiArchiveSystem.U3DEditor
         bool _foldoutValue;
         public Object field_archiveSetting;
 
-        [MenuItem(Consts.QueryArchiveToolPath)]
+        [MenuItem(Consts.QueryArchiveToolPath, false ,-100)]
         public static void ShowWindow()
         {
             _window = EditorWindow.GetWindow(typeof(FlexiDataQueryWindow),false,"Flexi-ArchiveMonitor") as FlexiDataQueryWindow;

@@ -33,7 +33,6 @@ namespace FlexiArchiveSystem
                 return;
             }
             SetDataArchiveSetting(settingInfo.ArchiveSetting as FlexiArchiveSetting);
-            SetDataArchiveSettingName(settingInfo.SettingName);
             InitDataArchiveSetting();
             InitDataArchiveContainer();
             ArchiveManagerRegister.instance.Register(this);
@@ -66,11 +65,6 @@ namespace FlexiArchiveSystem
             }
 #endif
             ArchiveSetting = setting;
-        }
-
-        private void SetDataArchiveSettingName(string settingName)
-        {
-            ArchiveSetting.name = settingName;
         }
 
         public void InitDataArchiveSetting()

@@ -11,12 +11,10 @@ namespace FlexiArchiveSystem
 {
     public struct ArchiveSettingWrapper
     {
-        public readonly string SettingName;
         public readonly IArchiveSetting ArchiveSetting;
 
-        public ArchiveSettingWrapper(string settingName, IArchiveSetting setting)
+        public ArchiveSettingWrapper(IArchiveSetting setting)
         {
-            SettingName = settingName;
             ArchiveSetting = setting;
         }
     }

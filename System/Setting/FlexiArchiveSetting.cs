@@ -28,7 +28,6 @@ namespace FlexiArchiveSystem.Setting
         public List<int> AllArchiveID { get; }
         public IDataArchiveOperation DataArchiveOperation { get; set; }
         public DataSystemInfoArchiveOperation DataTypeSystemInfoOperation { get; set; }
-        public string Name { get; }
         public void Init();
         public int GetNextArchiveID();
         public void SetArchiveID(int val, bool isUpdateToDisk = true);

@@ -36,7 +36,6 @@ namespace FlexiArchiveSystem.Setting
         [Header("存档系统标识")]
         [SerializeField] private string _ModuleName;
         public string ModuleName => _ModuleName;
-        public string Name => name; //SO文件名
         public int CurrentArchiveID { get; private set; }
 
         [NonSerialized] private List<int> _AllArchiveID = null;

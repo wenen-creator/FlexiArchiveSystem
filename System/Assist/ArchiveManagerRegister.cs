@@ -24,12 +24,7 @@ namespace FlexiArchiveSystem.Assist
                 Logger.LOG_ERROR("存档系统的 ModuleName 不能为空");
                 return;
             }
-            if (ArchiveMgrMap.ContainsKey(ModuleName))
-            {
-                Logger.LOG_ERROR("相同ModuleName的存档系统重复注册, 请检查");
-                return;
-            }
-            ArchiveMgrMap.Add(ModuleName, mgr);
+            ArchiveMgrMap[ModuleName] = mgr;
         }
         
         public void RemoveRegister(IFlexiDataArchiveManager mgr)

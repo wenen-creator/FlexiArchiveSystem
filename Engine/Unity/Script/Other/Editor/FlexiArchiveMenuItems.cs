@@ -1,4 +1,11 @@
-﻿using System;
+﻿//-------------------------------------------------
+//            Flexi Archive System
+// Copyright (c) 2024 温文. All rights reserved.
+//       blog: https://www.unitymake.com
+//        email: yixiangluntan@163.com
+//-------------------------------------------------
+
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -8,7 +15,7 @@ namespace FlexiArchiveSystem.U3DEditor
 {
     public class FlexiArchiveMenuItems
     {
-        [MenuItem(Consts.ClearAllArchiveToolPath)]
+        [MenuItem(Consts.ClearAllArchiveToolPath,false,0)]
         public static void ClearAllArchive()
         {
             var path = DataArchiveConstData.UserArchiveDirectoryPath;

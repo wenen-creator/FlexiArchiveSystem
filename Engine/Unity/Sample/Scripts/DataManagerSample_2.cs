@@ -16,8 +16,7 @@ namespace FlexiArchiveSystem.Sample
 
         protected override ArchiveSettingWrapper LoadDataArchiveSettingFromDisk()
         {
-            return new ArchiveSettingWrapper("DataArchiveSettingByGameplay",
-                Resources.Load<FlexiArchiveSetting>("DataArchiveSettingByFile"));
+            return new ArchiveSettingWrapper(Resources.Load<FlexiArchiveSetting>("DataArchiveSettingBySetting"));
         }
     }
 }
