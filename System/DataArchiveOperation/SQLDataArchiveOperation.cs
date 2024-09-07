@@ -6,11 +6,9 @@
 //-------------------------------------------------
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using FlexiArchiveSystem.ArchiveOperation.IO;
 using FlexiArchiveSystem.Assist;
@@ -453,7 +451,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
 
         private string GetAndCombineDataFilePath()
         {
-            string databasePath = DataArchiveConstData.GetAndCombineDataFilePath(Path, "database");
+            string databasePath = DataArchiveConstData.GetAndCombineDataFilePath(Path, _archiveID.ToString());
             return databasePath;
         }
     }

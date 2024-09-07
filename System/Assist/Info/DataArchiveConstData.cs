@@ -14,6 +14,8 @@ namespace FlexiArchiveSystem
         private static string AUTHOR { get; set; } = "温文";
         public static string USER_KEY { get; set; } = "Wenen";
         public const string Prefix_ArchiveIDKey = "ArchiveID";
+        private const string ArchiveExtensionName = "bin";
+        private const string SaveAllGroupKeyFileName = "group";
         private static string _ArchiveRootDirectoryPath;
 
         private static string ArchiveRootDirectoryPath
@@ -22,7 +24,7 @@ namespace FlexiArchiveSystem
             {
                 if (string.IsNullOrEmpty(_ArchiveRootDirectoryPath))
                 {
-                    _ArchiveRootDirectoryPath = Path.Combine(AppPersistentDataPath, "Archive2024");
+                    _ArchiveRootDirectoryPath = Path.Combine(AppPersistentDataPath, "tmp");
                 }
 
                 return _ArchiveRootDirectoryPath;
@@ -51,7 +53,12 @@ namespace FlexiArchiveSystem
 
         public static string GetAndCombineDataFilePath(string path, string groupKey)
         {
-            string groupFilePath = Path.Combine(path, string.Format("{0}.{1}", groupKey, "archive"));
+            string fileName = groupKey;
+            if (string.IsNullOrEmpty(ArchiveExtensionName) == false)
+            {
+                fileName = string.Format("{0}.{1}",fileName, ArchiveExtensionName);
+            }
+            string groupFilePath = Path.Combine(path, fileName);
             return groupFilePath;
         }
 
@@ -74,7 +81,7 @@ namespace FlexiArchiveSystem
 
         public static string GetArchiveGroupKeysFilePath(string ModuleName, int archiveID)
         {
-            return Path.Combine(GetArchiveDirectoryPath(ModuleName, archiveID), "groups.key");
+            return Path.Combine(GetArchiveDirectoryPath(ModuleName, archiveID), SaveAllGroupKeyFileName);
         }
 
         public static string GetGroupKeyInPlayerPrefs(string groupKey)
