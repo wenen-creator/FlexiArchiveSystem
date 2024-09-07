@@ -4,12 +4,14 @@
 
 &ensp;&ensp;正如 *Flexi Archive* 名字一样，*Flexi Archive* 以 **Flexible** 为设计理念，旨在通过其高度可扩展性、易上手、高性能以及完善的工具等特点，提供一个满足复杂存档需求的灵活而强大的解决方案。
 
-&ensp;&ensp;在 *Flexi Archive System* 中你可以用轻松地几行代码跨平台保存几乎任何东西，同时 *Flexi Archive System* 以其高度可扩展的架构设计，允许你根据实际需求轻松的自定义数据类型和存档策略、数据格式。
+&ensp;&ensp;在 *Flexi Archive System* 中你可以用轻松地几行代码 **跨平台** 保存几乎任何东西，同时 *Flexi Archive System* 以其高度可扩展的架构设计，允许你根据实际需求**轻松**的自定义数据类型和存档策略、数据格式。
 
-&ensp;&ensp; *Flexi Archive System* 系统采用了高效的存储机制。默认采用按需载入原则，通过合批、异步IO、缓存机制、分组策略、脏标记等大量优化策略，确保用户在进行大量频繁的数据操作时，也能够快速响应。得以轻松应对游戏中复杂需求。
+&ensp;&ensp; *Flexi Archive System* 系统采用了**高效**的存储机制。默认采用按需载入原则，通过合批、异步IO、缓存机制、分组策略、脏标记等大量优化策略，确保用户在进行大量频繁的数据操作时，也能够快速响应。得以轻松应对游戏中复杂需求。
 
 
 ## 文档
+
+&ensp;&ensp;[Unity-Android申请读写权限配置流程](https://www.unitymake.com/archives/unity/3987)
 
 &ensp;&ensp;建议你在使用 *Flexi Archive* 前，先打开 **Sample** 案例。
 
