@@ -12,5 +12,10 @@ namespace FlexiArchiveSystem
         public DataBoolean(string dataStr) : base(dataStr)
         {
         }
+
+        public override bool Equals(bool another)
+        {
+            return another.Equals(data);
+        }
     }
 }

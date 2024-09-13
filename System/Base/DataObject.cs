@@ -86,6 +86,7 @@ namespace FlexiArchiveSystem
 
       private T ConvertTo<T>(string dataStr) where T : IDataType
       {
+         Type[] types = new Type[] { typeof(int) };
          var concreteDataType = (T)Activator.CreateInstance(typeof(T), dataStr);
          return concreteDataType;
       }

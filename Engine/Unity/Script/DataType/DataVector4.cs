@@ -14,8 +14,14 @@ namespace FlexiArchiveSystem
         {
 
         }
+
+        public override bool Equals(Vector4Wrapper another)
+        {
+            return another.Equals(data);
+        }
     }
 
+    [System.Serializable]
     public struct Vector4Wrapper
     {
         public float x;

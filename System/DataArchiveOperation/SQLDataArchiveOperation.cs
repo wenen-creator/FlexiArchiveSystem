@@ -110,7 +110,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
                 InitDBConnection();
             }
             
-
+            int dataStrVarcharLen = dataStr.Length; 
             string queryGroupTableCmd = $"select name from sqlite_master where type='table' and name='{groupKey}'";
             SqliteCommand groupCommand = new SqliteCommand(queryGroupTableCmd, connection);
             var cmdReader = groupCommand.ExecuteReader();
@@ -118,13 +118,16 @@ namespace FlexiArchiveSystem.ArchiveOperation
             if (exsitTable == false)
             {
                 //create table
-                string createTableCmd = $"create table {groupKey}(dataKey varchar(32) PRIMARY KEY,data varchar(32));";
+                string createTableCmd = $"create table {groupKey}(dataKey varchar({dataStrVarcharLen}) PRIMARY KEY,data varchar({dataStrVarcharLen}));";
                 SqliteCommand createTableCommand = new SqliteCommand(createTableCmd, connection);
                 createTableCommand.ExecuteNonQuery();
             }
 
-            string updateDataCmd = $"INSERT OR REPLACE into {groupKey} (dataKey,data) values ('{dataKey}','{dataStr}')";
+            string updateDataCmd = $"INSERT OR REPLACE into {groupKey} (dataKey,data) values (@dataKey,@dataStr)";
+            
             SqliteCommand queryDataCommand = new SqliteCommand(updateDataCmd, connection);
+            queryDataCommand.Parameters.AddWithValue("@dataKey",dataKey);
+            queryDataCommand.Parameters.AddWithValue("@dataStr",dataStr);
             queryDataCommand.ExecuteNonQuery();
 
             bool isExist = TryGetData(groupKey, dataKey, out string lastResult);
@@ -162,6 +165,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
                 InitDBConnection();
             }
 
+            int dataStrVarcharLen = dataStr.Length; 
             string queryGroupTableCmd = $"select name from sqlite_master where type='table' and name='{groupKey}'";
             SqliteCommand groupCommand = new SqliteCommand(queryGroupTableCmd, connection);
             var cmdReader = await (groupCommand.ExecuteReaderAsync());
@@ -170,13 +174,16 @@ namespace FlexiArchiveSystem.ArchiveOperation
             if (exsitTable == false)
             {
                 //create table
-                string createTableCmd = $"create table {groupKey}(dataKey varchar(32) PRIMARY KEY,data varchar(32));";
+                string createTableCmd = $"create table {groupKey}(dataKey varchar({dataStrVarcharLen}) PRIMARY KEY,data varchar({dataStrVarcharLen}));";
                 SqliteCommand createTableCommand = new SqliteCommand(createTableCmd, connection);
                 await createTableCommand.ExecuteNonQueryAsync();
             }
 
-            string updateDataCmd = $"INSERT OR REPLACE into {groupKey} (dataKey,data) values ('{dataKey}','{dataStr}')";
+            string updateDataCmd = $"INSERT OR REPLACE into {groupKey} (dataKey,data) values (@dataKey,@dataStr)";
+            
             SqliteCommand queryDataCommand = new SqliteCommand(updateDataCmd, connection);
+            queryDataCommand.Parameters.AddWithValue("@dataKey",dataKey);
+            queryDataCommand.Parameters.AddWithValue("@dataStr",dataStr);
             await queryDataCommand.ExecuteNonQueryAsync();
 
             bool isExist = TryGetData(groupKey, dataKey, out string lastResult);
