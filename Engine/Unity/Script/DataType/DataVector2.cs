@@ -33,6 +33,12 @@ namespace FlexiArchiveSystem
             x = value.x;
             y = value.y;
         }
+        
+        public Vector2Wrapper(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
+        }
 
         public static implicit operator Vector2Wrapper(Vector2 value)
         {

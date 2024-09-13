@@ -40,22 +40,12 @@ namespace FlexiArchiveSystem.Sample
 		{
 			if (Input.GetKeyDown(KeyCode.A))
 			{
-				DataObject dataObject = archiveManager.GetDataObject("group1", "key1");
-				DataStructList<float> dataStructList = dataObject.GetData<DataStructList<float>>();
-				List<float> list = new List<float>();
-				list.Add(Random.Range(0, 5));
-				list.Add(Random.Range(0, 5));
-				list.Add(Random.Range(0, 5));
-				list.Add(Random.Range(0, 5));
-				dataStructList.Write(list);
-				Debug.Log(string.Format($"[{Path.Combine("group1", "key1")}]: write a str ：{dataStructList.data}"));
+				Demo11_WriteDic();
 			}
 
 			if (Input.GetKeyDown(KeyCode.B))
 			{
-				DataObject dataObject = archiveManager.GetDataObject("group1", "key1");
-				DataStructList<float> dataStructList = dataObject.GetData<DataStructList<float>>();
-				Debug.Log(string.Format($"[{Path.Combine("group1", "key1")}]: write a str ：{dataStructList.DiskData}"));
+				Demo11_WriteDic();
 			}
 		}
 
@@ -147,7 +137,7 @@ namespace FlexiArchiveSystem.Sample
 			list.Add(Random.Range(0, 5));
 			list.Add(Random.Range(0, 5));
 			dataStructList.Write(list);
-			string log = dataStructList.data.ToString() + " - { ";
+			string log = dataStructList.data.ToString() + " - [ ";
 			foreach (var ele in dataStructList.data)
 			{
 				log += ele.ToString();
@@ -155,7 +145,7 @@ namespace FlexiArchiveSystem.Sample
 			}
 
 			log = log.Remove(log.Length - 1);
-			log += " }";
+			log += " ]";
 			Debug.Log(($"[{Path.Combine("group3", "key1")}]: write a list ：{log}"));
 			return log;
 		}
@@ -167,17 +157,45 @@ namespace FlexiArchiveSystem.Sample
 			string log = "null";
 			if (dataStructList.DiskData != null)
 			{
-				log = dataStructList.DiskData.ToString() + " - { ";
+				log = dataStructList.DiskData.ToString() + " - [ ";
 				foreach (var ele in dataStructList.DiskData)
 				{
 					log += ele.ToString();
 					log += ",";
 				}
 				log = log.Remove(log.Length - 1);
-				log += " }";
+				log += " ]";
 			}
 			
 			Debug.Log(($"[{Path.Combine("group3", "key1")}]: write a list ：{log}"));
+			return log;
+		}
+		
+		private string Demo11_WriteDic()
+		{
+			DataObject dataObject = archiveManager.GetDataObject("group3", "key3");
+			DataDictionary<Vector3Wrapper> dataDictionary = dataObject.GetData<DataDictionary<Vector3Wrapper>>();
+			Dictionary<string, Vector3Wrapper> dictionary = new Dictionary<string, Vector3Wrapper>();
+			dictionary.Add(1.ToString(),new Vector3(1,1,1));
+			dictionary.Add(2.ToString(),new Vector3(2,2,2));
+			dictionary.Add(3.ToString(),new Vector3(3,4,4));
+			dataDictionary.Write(dictionary);
+			string log = dataDictionary.data.ToString() + " - " + dataDictionary.ToString();
+			Debug.Log(($"[{Path.Combine("group3", "key1")}]: write a dictionary ：{log}"));
+			return log;
+		}
+		
+		private string Demo12_ReadDic()
+		{
+			DataObject dataObject = archiveManager.GetDataObject("group3", "key3");
+			DataDictionary<Vector3Wrapper> dataDictionary = dataObject.GetData<DataDictionary<Vector3Wrapper>>();
+			string log = "null";
+			if (dataDictionary.DiskData != null)
+			{
+				log = dataDictionary.DiskData.ToString() + " - " + dataDictionary.ToString();
+			}
+			
+			Debug.Log(($"[{Path.Combine("group3", "key1")}]: write a dictionary ：{log}"));
 			return log;
 		}
 		

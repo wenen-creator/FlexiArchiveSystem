@@ -35,6 +35,13 @@ namespace FlexiArchiveSystem
             y = value.y;
             z = value.z;
         }
+        
+        public Vector3Wrapper(float x, float y, float z)
+        {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
 
         public static implicit operator Vector3Wrapper(Vector3 value)
         {

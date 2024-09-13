@@ -43,6 +43,11 @@ namespace FlexiArchiveSystem
         }
         public override bool Equals(List<T> another)
         {
+            return another == data;
+        }
+
+        public bool ElementsIsEqual(List<T> another)
+        {
             bool isSameRef = (another == data);
             if (isSameRef)
             {
@@ -76,7 +81,7 @@ namespace FlexiArchiveSystem
             string str = null;
             if (data != null)
             {
-                str ="{";
+                str ="[";
                 if (data.Count > 0)
                 {
                     str += data[0];
@@ -86,7 +91,7 @@ namespace FlexiArchiveSystem
                     }
                 }
 
-                str += "}";
+                str += "]";
             }
 
             return str;
@@ -100,6 +105,11 @@ namespace FlexiArchiveSystem
             
         }
         public override bool Equals(T[] another)
+        {
+            return another == data;
+        }
+
+        public bool ElementsIsEqual(T[]another)
         {
             bool isSameRef = (another == data);
             if (isSameRef)
@@ -125,7 +135,7 @@ namespace FlexiArchiveSystem
                     return false;
                 }
             }
-            
+
             return true;
         }
         
@@ -134,7 +144,7 @@ namespace FlexiArchiveSystem
             string str = null;
             if (data != null)
             {
-                str ="{";
+                str ="[";
                 if (data.Length > 0)
                 {
                     str += data[0];
@@ -144,10 +154,172 @@ namespace FlexiArchiveSystem
                     }
                 }
 
+                str += "]";
+            }
+
+            return str;
+        }
+    }
+    
+    public class DataList<T> : AbstractDataType<List<T>> 
+    {
+        public DataList(string dataStr) : base(dataStr)
+        {
+        }
+        public override bool Equals(List<T> another)
+        {
+            return another == data;
+        }
+
+        public bool ElementsIsEqual(List<T> another)
+        {
+            bool isSameRef = (another == data);
+            if (isSameRef)
+            {
+                return true;
+            }
+
+            if (another == null || data == null)
+            {
+                return false;
+            }
+            
+            
+            if (another.Count != data.Count)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < another.Count; i++)
+            {
+                if (another[i].Equals(data[i]) == false)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        protected override string ToString(List<T> data)
+        {
+            string str = null;
+            if (data != null)
+            {
+                str ="[";
+                if (data.Count > 0)
+                {
+                    str += data[0].ToString();
+                    for (int i = 1; i < data.Count; i++)
+                    {
+                        str +="," + data[i];
+                    }
+                }
+
+                str += "]";
+            }
+
+            return str;
+        }
+    }
+    
+    public class DataArray<T> : AbstractDataType<T[]> 
+    {
+        public DataArray(string dataStr) : base(dataStr)
+        {
+            
+        }
+        public override bool Equals(T[] another)
+        {
+            return another == data;
+        }
+
+        public bool ElementsIsEqual(T[] another)
+        {
+            bool isSameRef = (another == data);
+            if (isSameRef)
+            {
+                return true;
+            }
+
+            if (another == null || data == null)
+            {
+                return false;
+            }
+            
+            
+            if (another.Length != data.Length)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < another.Length; i++)
+            {
+                if (another[i].Equals(data[i]) == false)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        
+        protected override string ToString(T[] data)
+        {
+            string str = null;
+            if (data != null)
+            {
+                str ="[";
+                if (data.Length > 0)
+                {
+                    str += data[0].ToString();
+                    for (int i = 1; i < data.Length; i++)
+                    {
+                        str +="," + data[i];
+                    }
+                }
+
+                str += "]";
+            }
+
+            return str;
+        }
+    }
+
+    internal class DataDictionary<TValue> : AbstractDataType<Dictionary<string, TValue>> 
+    {
+        public DataDictionary(string dataStr) : base(dataStr)
+        {
+            
+        }
+        
+        public override bool Equals(Dictionary<string, TValue> another)
+        {
+            return another.Equals(data);
+        }
+
+        protected override string ToString(Dictionary<string, TValue> data)
+        {
+            string str = null;
+            if (data != null)
+            {
+                str ="{";
+                if (data.Count > 0)
+                {
+                    var keyCollections = data.Keys;
+                    foreach (var key in keyCollections)
+                    {
+                        str += string.Format("'{0}' : {1}, ", key, data[key].ToString());
+                    }
+
+                    str = str.Remove(str.Length - 2,2);
+                }
+
                 str += "}";
             }
 
             return str;
         }
     }
+    
 }
