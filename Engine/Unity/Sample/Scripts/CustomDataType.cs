@@ -21,6 +21,11 @@ namespace FlexiArchiveSystem.Sample
 		{
 
 		}
+
+		public override bool Equals(CustomData another)
+		{
+			throw new System.NotImplementedException();
+		}
 	}
 
 	/// <summary>

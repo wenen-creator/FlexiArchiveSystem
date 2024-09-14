@@ -15,8 +15,14 @@ namespace FlexiArchiveSystem
         {
 
         }
+
+        public override bool Equals(Vector2Wrapper another)
+        {
+            return another.Equals(data);
+        }
     }
 
+    [System.Serializable]
     public struct Vector2Wrapper
     {
         public float x;
@@ -26,6 +32,12 @@ namespace FlexiArchiveSystem
         {
             x = value.x;
             y = value.y;
+        }
+        
+        public Vector2Wrapper(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
         }
 
         public static implicit operator Vector2Wrapper(Vector2 value)

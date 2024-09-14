@@ -76,6 +76,16 @@
 
 &ensp;&ensp;Flexi Archive System 支持轻松添加新的数据类型和存档策略，允许你存档自定义的复杂类型数据。 
 
+&ensp;&ensp;目前系统已支持的类型：
+
+|   -----    |  -----  |  -----  |
+|:----------:|:-------:|:-------:|
+|   float    | double  |   int   |
+|    long    |  bool   | string  |
+|  vector2   | vector3 | vector4 |
+|   object   |  list   |  array  |
+| dictionary | custom |  ·····  |
+
 &ensp;&ensp;如果你需要存档一个自定义类型，你无需关心存档过程中所做的操作，也无需对系统进行修改。你只需负责创建一个 CustomData 以及一个 AbstractDataType<CustomData> 具体类型，按照Litjson0.19所支持的类型要求对复杂的数据进行转换。 [具体见LitJson文档](https://litjson.net/blog/2023/11/litjson-v0.19.0-released)
 
 &ensp;&ensp;建议你在编写 Wrapper 的同时对 ToString 方法进行重写，方便数据以明文的形式显示在开发环境中。

@@ -319,7 +319,9 @@ namespace FlexiArchiveSystem.U3DEditor
             catch (Exception e)
             {
                 isQueryError = true;
-                Assist.Logger.LOG_ERROR(e.Message);
+#if UNITY_EDITOR && EDITOR_DEV_WENEN
+                Assist.Logger.LOG_ERROR(e.Message);          
+#endif
             }
 
         }
@@ -333,10 +335,13 @@ namespace FlexiArchiveSystem.U3DEditor
             try
             {
                 dataTypeSystemType = DataArchiveSetting.DataTypeSystemInfoOperation.GetTypeOfDataValue(groupKey, dataKey);
+                
+#if UNITY_EDITOR && EDITOR_DEV_WENEN
                 if (dataTypeSystemType == null)
                 {
                     Logger.LOG_ERROR("SystemInfo信息缺失");
                 }
+#endif
             }
             catch (Exception)
             {

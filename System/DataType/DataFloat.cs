@@ -12,5 +12,10 @@ namespace FlexiArchiveSystem
         public DataFloat(string dataStr) : base(dataStr)
         {
         }
+
+        public override bool Equals(float another)
+        {
+            return another.Equals(data);
+        }
     }
 }

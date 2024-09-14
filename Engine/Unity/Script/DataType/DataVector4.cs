@@ -14,8 +14,14 @@ namespace FlexiArchiveSystem
         {
 
         }
+
+        public override bool Equals(Vector4Wrapper another)
+        {
+            return another.Equals(data);
+        }
     }
 
+    [System.Serializable]
     public struct Vector4Wrapper
     {
         public float x;
@@ -29,6 +35,14 @@ namespace FlexiArchiveSystem
             y = value.y;
             z = value.z;
             w = value.w;
+        }
+        
+        public Vector4Wrapper(float x, float y, float z, float w)
+        {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.w = w;
         }
 
         public static implicit operator Vector4Wrapper(Vector4 value)

@@ -12,5 +12,10 @@ namespace FlexiArchiveSystem
         public DataDouble(string dataStr) : base(dataStr)
         {
         }
+        
+        public override bool Equals(double another)
+        {
+            return another.Equals(data);
+        }
     }
 }

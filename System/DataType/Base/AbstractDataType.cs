@@ -12,7 +12,8 @@ namespace FlexiArchiveSystem
 {
     public abstract partial class AbstractDataType<T> : IDataType, IEquatable<T>
     {
-        public class DataWraper<TData>
+        [Serializable]
+        public class DataWraper<TData> 
         {
             public TData value;
         }
@@ -23,10 +24,12 @@ namespace FlexiArchiveSystem
         public T DiskData => diskData;
         public event Action OnDirtyHandler;
         private DataTypeSystemInfo _systemInfo;
+        protected ArchiveOperationType _ArchiveOperationType;
         DataTypeSystemInfo IDataType.SystemInfo
         {
             get => _systemInfo;
         }
+        
         
 
         public AbstractDataType(string dataStr)
@@ -39,8 +42,6 @@ namespace FlexiArchiveSystem
 
             _systemInfo = new DataTypeSystemInfo(this.GetType().ToString());
         }
-
-        private ArchiveOperationType _ArchiveOperationType;
 
         public void InjectArchiveOperationType(ArchiveOperationType archiveOperationType)
         {
@@ -71,10 +72,7 @@ namespace FlexiArchiveSystem
             }
         }
 
-        public virtual bool Equals(T other)
-        {
-            return _dataWraper.value.Equals(other);
-        }
+        public abstract bool Equals(T another);
 
         public void Reset()
         {

@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace FlexiArchiveSystem.U3DEditor
 {
-#if EDITOR_DEV_WENEN
+#if UNITY_EDITOR && EDITOR_DEV_WENEN
     [CreateAssetMenu(menuName = "Flexi Archive System/GUIStyleSetting")]
 #endif
     public class FlexiGUIStyleSetting : ScriptableObject

@@ -5,6 +5,8 @@
 //        email: yixiangluntan@163.com
 //-------------------------------------------------
 
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Logger = FlexiArchiveSystem.Assist.Logger;
 
@@ -61,7 +63,7 @@ namespace FlexiArchiveSystem.Sample
 			}
 			
 			var groundWidth = 400;
-			var groundHeight = 150;
+			var groundHeight = 200;
 			var screenWidth = Screen.width;
 			var screenHeight = Screen.height;
 			var groupx = (screenWidth - groundWidth) / 2;
@@ -69,49 +71,32 @@ namespace FlexiArchiveSystem.Sample
 			GUI.BeginGroup(new Rect(groupx, groupy, groundWidth, groundHeight));
 			GUI.Box(new Rect(0, 0, groundWidth, groundHeight), "Select");
 			isAsync = GUI.Toggle(new Rect(groundWidth - 80, 2, 80, 30),isAsync, "IsAsync");
-			if (GUI.Button(new Rect(10, 30, 120, 30), "1.write(1-1)"))
-			{
-				write_str = Demo1_WriteStr();
-			}
+			List<Tuple<string, Action>> ele = new List<Tuple<string, Action>>();
+			ele.Add(new Tuple<string, Action>("1.write(1-1):str", () => { write_str = Demo1_WriteStr(); }));
+			ele.Add(new Tuple<string, Action>("2.read(1-1):str", () => { read_str = Demo2_ReadStrFromDisk(); }));
+			ele.Add(new Tuple<string, Action>("3.write(2-2):vec2", () => { write_str = Demo5_WriteVector2(); }));
+			
+			ele.Add(new Tuple<string, Action>("4.read(2-2):vec2", () => { read_str = Demo6_ReadVector2(); }));
+			ele.Add(new Tuple<string, Action>("5.write(3-1):list", () => { write_str = Demo9_WriteList(); }));
+			ele.Add(new Tuple<string, Action>("6.read(3-1):list", () => { read_str = Demo10_ReadList(); }));
+			
+			ele.Add(new Tuple<string, Action>("7.write(3-2):obj", () => { write_str = Demo7_WriteObj(); }));
+			ele.Add(new Tuple<string, Action>("8.read(3-2):obj", () => { read_str = Demo8_ReadObj(); }));
+			ele.Add(new Tuple<string, Action>("9.Clear Cache", () => {  Demo_ClearCache(); }));
+			
+			ele.Add(new Tuple<string, Action>("10.save", () => { Demo_SavePoint(isAsync); }));
+			ele.Add(new Tuple<string, Action>("11.DeleteAll", () => { Demo_DeleteCurrentArchive(); }));
+			ele.Add(new Tuple<string, Action>("12.Clone Archive", () => { CloneArchive(); }));
 
-			if (GUI.Button(new Rect(10, 70, 120, 30), "2.read(1-1)"))
+			
+			for (int i = 0; i < ele.Count; i++)
 			{
-				read_str = Demo2_ReadStrFromDisk();
-			}
-
-			if (GUI.Button(new Rect(10, 110, 120, 30), "3.write(2-1):num"))
-			{
-				write_str = Demo3_WriteInt();
-			}
-
-			if (GUI.Button(new Rect(140, 30, 120, 30), "4.read(2-1):num"))
-			{
-				read_str = Demo4_ReadIntFromDisk();
-			}
-
-			if (GUI.Button(new Rect(140, 70, 120, 30), "5.write(2-2):vec2"))
-			{
-				write_str = Demo5_WriteVector2();
-			}
-
-			if (GUI.Button(new Rect(140, 110, 120, 30), "6.read(2-2):vec2"))
-			{
-				read_str = Demo6_ReadVector2();
-			}
-
-			if (GUI.Button(new Rect(270, 30, 120, 30), "7.save"))
-			{
-				Demo7_SavePoint(isAsync);
-			}
-
-			if (GUI.Button(new Rect(270, 70, 120, 30), "8.DeleteAll"))
-			{
-				Demo_DeleteCurrentArchive();
-			}
-
-			if (GUI.Button(new Rect(270, 110, 120, 30), "9.Clone Archive"))
-			{
-				CloneArchive();
+				int rowIndex = i / 3;
+				int colIndex = i % (ele.Count / 4);
+				if (GUI.Button(new Rect(10 + colIndex * 130, 30 + rowIndex * 40, 120, 30), ele[i].Item1))
+				{
+					ele[i].Item2.Invoke();
+				}
 			}
 			GUI.EndGroup();
 			GUI.BeginGroup(new Rect((screenWidth - 200) / 2, groupy + groundHeight + 50, 200, 50));

@@ -12,5 +12,10 @@ namespace FlexiArchiveSystem
         public DataInteger(string dataStr) : base(dataStr)
         {
         }
+
+        public override bool Equals(int another)
+        {
+            return another.Equals(data);
+        }
     }
 }
