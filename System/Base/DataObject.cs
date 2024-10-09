@@ -74,6 +74,20 @@ namespace FlexiArchiveSystem
 
          return CreateDataType<T>();
       }
+      
+      public IDataType GetData(Type idataType)
+      {
+         if (_dataType != null)
+         {
+            return (IDataType)_dataType;
+         }
+
+         var concreteDataType = (IDataType)Activator.CreateInstance(idataType, _data);
+         _dataType = concreteDataType;
+         concreteDataType.OnDirtyHandler += SetDirty;
+         concreteDataType.InjectArchiveOperationType(_ArchiveSetting.ArchiveOperationMode);
+         return concreteDataType;
+      }
 
       private T CreateDataType<T>() where T : IDataType
       {
@@ -83,7 +97,7 @@ namespace FlexiArchiveSystem
          concreteDataType.InjectArchiveOperationType(_ArchiveSetting.ArchiveOperationMode);
          return concreteDataType;
       }
-
+      
       private T ConvertTo<T>(string dataStr) where T : IDataType
       {
          Type[] types = new Type[] { typeof(int) };
