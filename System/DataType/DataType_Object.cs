@@ -1,5 +1,13 @@
-﻿using System;
+﻿//-------------------------------------------------
+//            Flexi Archive System
+// Copyright (c) 2024 温文. All rights reserved.
+//       blog: https://www.playcreator.cn
+//        email: yixiangluntan@163.com
+//-------------------------------------------------
+
+using System;
 using System.Collections.Generic;
+using FlexiArchiveSystem.DataType.Base;
 using FlexiArchiveSystem.Serialization;
 
 namespace FlexiArchiveSystem
@@ -14,19 +22,19 @@ namespace FlexiArchiveSystem
     /// So I'm here to warn you that it's best not to use it in formal projects.
     /// </summary>
     [Obsolete("Note: 我不推荐你使用这个序列化方式，因为该方式会序列与值无关的所有元信息，其开销是巨大的。因此我在这里警告你，最好不要在正式项目中使用它。")]
-    public partial class DataTypeObject: AbstractDataType<System.Object>
+    public partial class DataType_Object: AbstractDataTypeWrapper<System.Object>
     {
-        public DataTypeObject(string dataStr) : base(dataStr)
+        public DataType_Object(string dataStr) : base(dataStr)
         {
         }
-        public override bool Equals(System.Object other) => other.Equals(_dataWraper.value);
+        public override bool Equals(System.Object other) => other.Equals(_dataWrapper.value);
 
         public override string Serialize()
         {
-            string str = DataTypeSerializeOperation.SerializeToBinary<System.Object>(_ArchiveOperationType, _dataWraper.value);
-            DataWraper<string> wraper = new DataWraper<string>();
-            wraper.value = str;
-            return DataTypeSerializeOperation.Serialize(_ArchiveOperationType,wraper);
+            string str = DataTypeSerializeOperation.SerializeToBinary<System.Object>(_ArchiveOperationType, _dataWrapper.value);
+            DataResultWrapper<string> wrapper = new DataResultWrapper<string>();
+            wrapper.value = str;
+            return DataTypeSerializeOperation.Serialize(_ArchiveOperationType,wrapper);
         }
 
         protected override System.Object DeSerialize(string dataStr)
@@ -36,7 +44,7 @@ namespace FlexiArchiveSystem
         }
     }
 
-    public class DataStructList<T> : AbstractDataType<List<T>> where T : struct
+    public class DataStructList<T> : AbstractDataTypeWrapper<List<T>> where T : struct
     {
         public DataStructList(string dataStr) : base(dataStr)
         {
@@ -98,7 +106,7 @@ namespace FlexiArchiveSystem
         }
     }
     
-    public class DataStructArray<T> : AbstractDataType<T[]> where T : struct
+    public class DataStructArray<T> : AbstractDataTypeWrapper<T[]> where T : struct
     {
         public DataStructArray(string dataStr) : base(dataStr)
         {
@@ -161,7 +169,7 @@ namespace FlexiArchiveSystem
         }
     }
     
-    public class DataList<T> : AbstractDataType<List<T>> 
+    public class DataList<T> : AbstractDataTypeWrapper<List<T>> 
     {
         public DataList(string dataStr) : base(dataStr)
         {
@@ -223,7 +231,7 @@ namespace FlexiArchiveSystem
         }
     }
     
-    public class DataArray<T> : AbstractDataType<T[]> 
+    public class DataArray<T> : AbstractDataTypeWrapper<T[]> 
     {
         public DataArray(string dataStr) : base(dataStr)
         {
@@ -286,7 +294,7 @@ namespace FlexiArchiveSystem
         }
     }
 
-    internal class DataDictionary<TValue> : AbstractDataType<Dictionary<string, TValue>> 
+    internal class DataDictionary<TValue> : AbstractDataTypeWrapper<Dictionary<string, TValue>> 
     {
         public DataDictionary(string dataStr) : base(dataStr)
         {

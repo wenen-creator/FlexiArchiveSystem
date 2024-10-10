@@ -1,7 +1,7 @@
 ﻿//-------------------------------------------------
 //            Flexi Archive System
 // Copyright (c) 2024 温文. All rights reserved.
-//       blog: https://www.unitymake.com
+//       blog: https://www.playcreator.cn
 //        email: yixiangluntan@163.com
 //-------------------------------------------------
 
@@ -75,14 +75,20 @@ namespace FlexiArchiveSystem
          return CreateDataType<T>();
       }
       
-      public IDataType GetData(Type idataType)
+      /// <summary>
+      /// 根据DataType的类型来取得IDataType实例。
+      /// </summary>
+      /// <param name="dataTypeMeta"></param>
+      /// <returns></returns>
+      public IDataType GetData(Type dataTypeMeta)
       {
          if (_dataType != null)
          {
             return (IDataType)_dataType;
          }
 
-         var concreteDataType = (IDataType)Activator.CreateInstance(idataType, _data);
+         // CreateDataType
+         var concreteDataType = (IDataType)Activator.CreateInstance(dataTypeMeta, _data);
          _dataType = concreteDataType;
          concreteDataType.OnDirtyHandler += SetDirty;
          concreteDataType.InjectArchiveOperationType(_ArchiveSetting.ArchiveOperationMode);

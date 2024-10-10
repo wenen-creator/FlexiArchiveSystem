@@ -1,15 +1,13 @@
 //-------------------------------------------------
 //            Flexi Archive System
 // Copyright (c) 2024 温文. All rights reserved.
-//       blog: https://www.unitymake.com
+//       blog: https://www.playcreator.cn
 //        email: yixiangluntan@163.com
 //-------------------------------------------------
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using Object = System.Object;
 using Random = UnityEngine.Random;
 
 namespace FlexiArchiveSystem.Sample
@@ -17,6 +15,7 @@ namespace FlexiArchiveSystem.Sample
 	public partial class DemoSample : MonoBehaviour
 	{
 		private IFlexiDataArchiveManager archiveManager;
+		private DataContainerForSave_Sample dataContainer;
 
 		/// <summary>
 		/// Launch Flexi-Archive System;
@@ -34,6 +33,7 @@ namespace FlexiArchiveSystem.Sample
 			DataManagerSample.instance.Init();
 			archiveManager = DataManagerSample.instance;
 			archiveID = archiveManager.GetLastArchiveID().ToString();
+			dataContainer = new DataContainerForSave_Sample(archiveManager);
 		}
 
 		private void Update()
@@ -46,6 +46,26 @@ namespace FlexiArchiveSystem.Sample
 			if (Input.GetKeyDown(KeyCode.B))
 			{
 				Demo11_WriteDic();
+			}
+			
+			if (Input.GetKeyDown(KeyCode.J))
+			{
+				TestPropertyBind_Write("温文",18);
+			}
+			
+			if (Input.GetKeyDown(KeyCode.N))
+			{
+				TestPropertyBind_Write("Miracle",19);
+			}
+
+			if (Input.GetKeyDown(KeyCode.K))
+			{
+				TestPropertyBind_ReadMemory();
+			}
+			
+			if (Input.GetKeyDown(KeyCode.L))
+			{
+				TestPropertyBind_ReadDisk();
 			}
 		}
 
@@ -62,7 +82,7 @@ namespace FlexiArchiveSystem.Sample
 		{
 			DataObject dataObject = archiveManager.GetDataObject("group1", "key1");
 			DataString dataString = dataObject.GetData<DataString>();
-			string str = dataString.DiskData;
+			string str = dataString.diskData;
 			Debug.Log(string.Format($"[{Path.Combine("group1", "key1")}]: read a str from disk: {str}"));
 			return str;
 		}
@@ -82,8 +102,8 @@ namespace FlexiArchiveSystem.Sample
 			DataObject dataObject = archiveManager.GetDataObject("group2", "key1");
 			DataInteger dataInteger = dataObject.GetData<DataInteger>();
 			Debug.Log(string.Format(
-				$"[{Path.Combine("group2", "key1")}]: read a int from disk  : {dataInteger.DiskData}"));
-			return dataInteger.DiskData.ToString();
+				$"[{Path.Combine("group2", "key1")}]: read a int from disk  : {dataInteger.diskData}"));
+			return dataInteger.diskData.ToString();
 		}
 
 		private string Demo5_WriteVector2()
@@ -100,27 +120,27 @@ namespace FlexiArchiveSystem.Sample
 			DataObject dataObject = archiveManager.GetDataObject("group2", "key2");
 			DataVector2 dataVector2 = dataObject.GetData<DataVector2>();
 			Debug.Log(string.Format(
-				$"[{Path.Combine("group2", "key2")}]: read a vector2 from disk：{dataVector2.DiskData}"));
-			return dataVector2.DiskData.ToString();
+				$"[{Path.Combine("group2", "key2")}]: read a vector2 from disk：{dataVector2.diskData}"));
+			return dataVector2.diskData.ToString();
 		}
 
 		private string Demo7_WriteObj()
 		{
 			DataObject dataObject = archiveManager.GetDataObject("group3", "key2");
-			DataTypeObject dataTypeObject = dataObject.GetData<DataTypeObject>();
-			dataTypeObject.Write(new Vector3Wrapper(new Vector3(6,6,6)));
-			Debug.Log(string.Format($"[{Path.Combine("group3", "key2")}]: write a object ：{dataTypeObject.data}"));
-			return dataTypeObject.data.ToString();
+			DataType_Object DataType_Object = dataObject.GetData<DataType_Object>();
+			DataType_Object.Write(new Vector3Wrapper(new Vector3(6,6,6)));
+			Debug.Log(string.Format($"[{Path.Combine("group3", "key2")}]: write a object ：{DataType_Object.data}"));
+			return DataType_Object.data.ToString();
 		}
 
 		private string Demo8_ReadObj()
 		{
 			DataObject dataObject = archiveManager.GetDataObject("group3", "key2");
-			DataTypeObject dataTypeObject = dataObject.GetData<DataTypeObject>();
+			DataType_Object DataType_Object = dataObject.GetData<DataType_Object>();
 			string str = "null";
-			if (dataTypeObject.DiskData != null)
+			if (DataType_Object.diskData != null)
 			{
-				Vector3 vector3 = (Vector3Wrapper)dataTypeObject.DiskData;
+				Vector3 vector3 = (Vector3Wrapper)DataType_Object.diskData;
 				str = vector3.ToString();
 			}
 			Debug.Log(string.Format($"[{Path.Combine("group3", "key2")}]: read a object ：{str}"));
@@ -155,10 +175,10 @@ namespace FlexiArchiveSystem.Sample
 			DataObject dataObject = archiveManager.GetDataObject("group3", "key1");
 			DataStructList<float> dataStructList = dataObject.GetData<DataStructList<float>>();
 			string log = "null";
-			if (dataStructList.DiskData != null)
+			if (dataStructList.diskData != null)
 			{
-				log = dataStructList.DiskData.ToString() + " - [ ";
-				foreach (var ele in dataStructList.DiskData)
+				log = dataStructList.diskData.ToString() + " - [ ";
+				foreach (var ele in dataStructList.diskData)
 				{
 					log += ele.ToString();
 					log += ",";
@@ -190,9 +210,9 @@ namespace FlexiArchiveSystem.Sample
 			DataObject dataObject = archiveManager.GetDataObject("group3", "key3");
 			DataDictionary<Vector3Wrapper> dataDictionary = dataObject.GetData<DataDictionary<Vector3Wrapper>>();
 			string log = "null";
-			if (dataDictionary.DiskData != null)
+			if (dataDictionary.diskData != null)
 			{
-				log = dataDictionary.DiskData.ToString() + " - " + dataDictionary.ToString();
+				log = dataDictionary.diskData.ToString() + " - " + dataDictionary.ToString();
 			}
 			
 			Debug.Log(($"[{Path.Combine("group3", "key1")}]: write a dictionary ：{log}"));
@@ -235,6 +255,21 @@ namespace FlexiArchiveSystem.Sample
 		{
 			archiveManager.SwitchArchiveID(archiveID);
 			Debug.Log(string.Format($"Switch Archive {archiveID}"));
+		}
+
+		private void TestPropertyBind_Write(string author, int age)
+		{
+			Debug.Log(string.Format($"[TestPropertyBind_Write] 尝试写入 author: {author} | age:{age}"));
+			dataContainer.author = author;
+			dataContainer.age = age;
+		}
+		private void TestPropertyBind_ReadDisk()
+		{
+			Debug.Log(string.Format($"[TestPropertyBind_Disk] author: {dataContainer.author_storage.diskData} | age:{dataContainer.age_storage.diskData}"));
+		}
+		private void TestPropertyBind_ReadMemory()
+		{
+			Debug.Log(string.Format($"[TestPropertyBind_Memory] author: {dataContainer.author} | age:{dataContainer.age}"));
 		}
 	}
 }

@@ -1,11 +1,11 @@
 ﻿//-------------------------------------------------
 //            Flexi Archive System
 // Copyright (c) 2024 温文. All rights reserved.
-//       blog: https://www.unitymake.com
+//       blog: https://www.playcreator.cn
 //        email: yixiangluntan@163.com
 //-------------------------------------------------
 
-namespace FlexiArchiveSystem
+namespace FlexiArchiveSystem.DataType.Base
 {
     public abstract class ValueWrapper<TWrapper, TValue> where TWrapper : ValueWrapper<TWrapper, TValue>, new()
     {

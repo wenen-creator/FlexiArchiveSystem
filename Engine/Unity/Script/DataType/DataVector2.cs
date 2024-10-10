@@ -1,15 +1,16 @@
 ﻿//-------------------------------------------------
 //            Flexi Archive System
 // Copyright (c) 2024 温文. All rights reserved.
-//       blog: https://www.unitymake.com
+//       blog: https://www.playcreator.cn
 //        email: yixiangluntan@163.com
 //-------------------------------------------------
 
+using FlexiArchiveSystem.DataType.Base;
 using UnityEngine;
 
 namespace FlexiArchiveSystem
 {
-    public class DataVector2 : AbstractDataType<Vector2Wrapper>
+    public class DataVector2 : AbstractDataTypeWrapper<Vector2Wrapper>
     {
         public DataVector2(string dataStr) : base(dataStr)
         {
