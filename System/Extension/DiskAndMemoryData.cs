@@ -5,18 +5,17 @@
 //        email: yixiangluntan@163.com
 //-------------------------------------------------
 
-using System.Threading;
-using UnityEngine;
-using Logger = FlexiArchiveSystem.Assist.Logger;
-
 namespace FlexiArchiveSystem
 {
-    public static class FlexiArchiveSystemInitializer
+    public struct DiskAndMemoryData<T>
     {
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
-        static void Init()
+        public T data;
+        public T diskData;
+
+        public DiskAndMemoryData(T data, T diskData)
         {
-            
+            this.data = data;
+            this.diskData = diskData;
         }
     }
 }

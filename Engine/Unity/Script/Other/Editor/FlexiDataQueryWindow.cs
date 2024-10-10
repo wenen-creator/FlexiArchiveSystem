@@ -1,7 +1,7 @@
 //-------------------------------------------------
 //            Flexi Archive System
 // Copyright (c) 2024 温文. All rights reserved.
-//       blog: https://www.unitymake.com
+//       blog: https://www.playcreator.cn
 //        email: yixiangluntan@163.com
 //-------------------------------------------------
 
@@ -349,14 +349,13 @@ namespace FlexiArchiveSystem.U3DEditor
             }
             
             Type valueType = dataTypeSystemType.BaseType.GetGenericArguments()[0];
-            var methodInfo_GetData = dataObject.GetType().GetMethod("GetData");
+            var methodInfo_GetData = dataObject.GetType().GetMethod("GetData",new Type[]{});
             methodInfo_GetData = methodInfo_GetData.MakeGenericMethod(dataTypeSystemType);
 
             object dataType = methodInfo_GetData.Invoke(dataObject, null);
-            Type genericDataType = Assembly.GetAssembly(typeof(IDataType)).GetType("FlexiArchiveSystem.AbstractDataType`1");
-            genericDataType = genericDataType.MakeGenericType(valueType);
+
             var methodInfo_DiskToStr =
-                genericDataType.GetMethod("DiskDataToString", BindingFlags.NonPublic | BindingFlags.Instance);
+                dataTypeSystemType.GetMethod("DiskDataToString", BindingFlags.NonPublic | BindingFlags.Instance);
             object diskDataStr = methodInfo_DiskToStr.Invoke(dataType, null);
             ResultWrapper resultWrapper = new ResultWrapper();
             resultWrapper.result = dataType.ToString();

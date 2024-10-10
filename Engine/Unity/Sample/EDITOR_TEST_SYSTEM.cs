@@ -1,7 +1,7 @@
 //-------------------------------------------------
 //            Flexi Archive System
 // Copyright (c) 2024 温文. All rights reserved.
-//       blog: https://www.unitymake.com
+//       blog: https://www.playcreator.cn
 //        email: yixiangluntan@163.com
 //-------------------------------------------------
 
@@ -23,7 +23,7 @@ namespace FlexiArchiveSystem.Sample
 		{
 			GUI.Label(new Rect(Screen.width/2 - 65,Screen.height - 90,130,50),"Flexi Archive System");
 			GUI.Label(new Rect(Screen.width/2 - 125,Screen.height - 70,280,50),"Copyright (c) 2024 温文. All rights reserved.");
-			GUI.Label(new Rect(Screen.width/2 - 95,Screen.height - 50,200,50),"blog: https://www.unitymake.com");
+			GUI.Label(new Rect(Screen.width/2 - 95,Screen.height - 50,200,50),"blog: https://www.playcreator.cn");
 			GUI.Label(new Rect(Screen.width/2 - 88,Screen.height - 30,200,50),"email: yixiangluntan@163.com");
 			if (Application.isPlaying == false || archiveManager == null)
 			{

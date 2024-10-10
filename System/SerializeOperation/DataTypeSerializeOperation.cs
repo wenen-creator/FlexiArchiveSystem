@@ -1,13 +1,14 @@
 ﻿//-------------------------------------------------
 //            Flexi Archive System
 // Copyright (c) 2024 温文. All rights reserved.
-//       blog: https://www.unitymake.com
+//       blog: https://www.playcreator.cn
 //        email: yixiangluntan@163.com
 //-------------------------------------------------
 
 using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using FlexiArchiveSystem.DataType.Base;
 using LitJson;
 
 namespace FlexiArchiveSystem.Serialization
@@ -21,7 +22,7 @@ namespace FlexiArchiveSystem.Serialization
         
         public static T DeSerialize<T>(ArchiveOperationType archiveOperationType, string dataStr)
         {
-            return JsonMapper.ToObject<AbstractDataType<T>.DataWraper<T>>(dataStr).value;
+            return JsonMapper.ToObject<AbstractDataTypeWrapper<T>.DataResultWrapper<T>>(dataStr).value;
         }
         
         public static string SerializeToBinary<T>(ArchiveOperationType archiveOperationType, T data)

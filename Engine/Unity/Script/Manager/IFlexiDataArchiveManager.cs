@@ -1,7 +1,7 @@
 ﻿//-------------------------------------------------
 //            Flexi Archive System
 // Copyright (c) 2024 温文. All rights reserved.
-//       blog: https://www.unitymake.com
+//       blog: https://www.playcreator.cn
 //        email: yixiangluntan@163.com
 //-------------------------------------------------
 
@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using FlexiArchiveSystem.Assist;
+using FlexiArchiveSystem.DataType.Base;
 using FlexiArchiveSystem.Entry;
 using FlexiArchiveSystem.Setting;
 using UnityEngine;
@@ -86,6 +87,51 @@ namespace FlexiArchiveSystem
         {
             ArchiveContainer.InstantiateNewArchive();
         }
+
+       public DiskAndMemoryData<TValue> GetValue<TDataType,TValue>(string GroupKey, string SubKey) where TDataType: AbstractDataTypeWrapper<TValue>
+        {
+            DataObject dataObject = GetDataObject(GroupKey, SubKey);
+            TDataType dataType = dataObject.GetData<TDataType>();
+            return new DiskAndMemoryData<TValue>(dataType.data, dataType.diskData);
+        }
+        
+        public TValue GetDiskValue<TDataType,TValue>(string GroupKey, string SubKey) where TDataType: AbstractDataTypeWrapper<TValue>
+        {
+            DataObject dataObject = GetDataObject(GroupKey, SubKey);
+            TDataType dataType = dataObject.GetData<TDataType>();
+            return dataType.diskData;
+        }
+        
+        public TValue GetMemoryValue<TDataType,TValue>(string GroupKey, string SubKey) where TDataType: AbstractDataTypeWrapper<TValue>
+        {
+            DataObject dataObject = GetDataObject(GroupKey, SubKey);
+            TDataType dataType = dataObject.GetData<TDataType>();
+            return dataType.data;
+        }
+
+        public void ModifyValue<TDataType,TValue>(string GroupKey, string SubKey, TValue value) where TDataType: AbstractDataTypeWrapper<TValue>
+        {
+            DataObject dataObject = GetDataObject(GroupKey, SubKey);
+            TDataType dataType = dataObject.GetData<TDataType>();
+            dataType.Write(value);
+        }
+        
+        /// <summary>
+        /// advise to use ModifyValue<TDataType,TValue>
+        /// </summary>
+        /// <param name="GroupKey"></param>
+        /// <param name="SubKey"></param>
+        /// <param name="value"></param>
+        /// <typeparam name="TValue"></typeparam>
+        [Obsolete("advise to use ModifyValue<TDataType,TValue>")]
+        public void ModifyValue<TValue>(string GroupKey, string SubKey, TValue value)
+        {
+            DataObject dataObject = GetDataObject(GroupKey, SubKey);
+            Type abstractDataTypeMeta = DataTypeBinder.GetByValueType<TValue>();
+            IDataType idataType = dataObject.GetData(abstractDataTypeMeta);
+            idataType.WriteByGenericObject(value);
+        }
+        
 
         public DataObject GetDataObject(string groupKey, string dataKey)
         {
