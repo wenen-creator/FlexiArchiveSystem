@@ -52,7 +52,7 @@ namespace FlexiArchiveSystem.DataType.Base
         {
             if (_methodInfoOfWriteData == null)
             {
-                _methodInfoOfWriteData = this.GetType().GetMethod("Write",BindingFlags.Public | BindingFlags.Instance);
+                _methodInfoOfWriteData = this.GetType().GetMethod(nameof(this.Write),BindingFlags.Public | BindingFlags.Instance);
             }
             return _methodInfoOfWriteData;
         }

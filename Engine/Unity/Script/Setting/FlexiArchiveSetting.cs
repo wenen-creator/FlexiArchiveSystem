@@ -42,7 +42,7 @@ namespace FlexiArchiveSystem.Setting
         public List<int> AllArchiveID => _AllArchiveID;
         public IDataArchiveOperation DataArchiveOperation { get; set; }
         public DataSystemInfoArchiveOperation DataTypeSystemInfoOperation { get; set; }
-
+        
         public void Init()
         {
             CurrentArchiveID = LoadCurrentArchiveIDFromDisk();

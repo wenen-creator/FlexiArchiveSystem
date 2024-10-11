@@ -29,9 +29,11 @@ namespace FlexiArchiveSystem.Sample
 
 			DeviceAccess.ApplyAccess();//高版本的安卓需要向设备申请权限，才能进行读写。
 
-			DataArchiveConstData.USER_KEY = "Wenen";
-			DataManagerSample.instance.Init();
-			archiveManager = DataManagerSample.instance;
+			DataArchiveConstData.USER_KEY = "Wenen"; //Set User‘s key
+			
+			archiveManager = DefaultDataArchiveManager.Instance; // Use the default 
+			// archiveManager = DataManagerSample.instance;// Use the custom
+			archiveManager.Init();
 			archiveID = archiveManager.GetLastArchiveID().ToString();
 			dataContainer = new DataContainerForSave_Sample(archiveManager);
 		}
