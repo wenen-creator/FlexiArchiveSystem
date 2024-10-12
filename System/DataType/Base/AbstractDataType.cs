@@ -41,6 +41,7 @@ namespace FlexiArchiveSystem
             }
 
             _systemInfo = new DataTypeSystemInfo(this.GetType().ToString());
+            DataTypeBinder.Register(this.GetType(),typeof(T));
         }
 
         public void InjectArchiveOperationType(ArchiveOperationType archiveOperationType)

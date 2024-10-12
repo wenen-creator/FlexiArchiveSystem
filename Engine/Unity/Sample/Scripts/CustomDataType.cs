@@ -5,10 +5,6 @@
 //        email: yixiangluntan@163.com
 //-------------------------------------------------
 
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 namespace FlexiArchiveSystem.Sample
 {
 	/// <summary>
