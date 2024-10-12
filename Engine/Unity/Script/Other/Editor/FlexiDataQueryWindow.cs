@@ -464,6 +464,7 @@ namespace FlexiArchiveSystem.U3DEditor
             selectArchiveID = id;
             DataArchiveSetting.SetArchiveID(selectArchiveID, false);
             DataArchiveSetting.CreateOrRebuildArchiveOperation();
+            DataArchiveManager.ClearMemoryCache();
             keyValuePairs.Clear();
         }
 
