@@ -1,4 +1,10 @@
-﻿using System;
+﻿//-------------------------------------------------
+//            Flexi Archive System
+// Copyright (c) 2024 温文. All rights reserved.
+//       blog: https://www.playcreator.cn
+//        email: yixiangluntan@163.com
+//-------------------------------------------------
+
 using UnityEngine;
 
 namespace FlexiArchiveSystem.Setting

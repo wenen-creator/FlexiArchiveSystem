@@ -1,7 +1,7 @@
 //-------------------------------------------------
 //            Flexi Archive System
-// Copyright (c) 2024 нбнд. All rights reserved.
-//       blog: https://www.unitymake.com
+// Copyright (c) 2024 О©╫О©╫О©╫О©╫. All rights reserved.
+//       blog: https://www.playcreator.cn
 //        email: yixiangluntan@163.com
 //-------------------------------------------------
 

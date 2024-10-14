@@ -1,46 +1,46 @@
 ﻿//-------------------------------------------------
 //            Flexi Archive System
 // Copyright (c) 2024 温文. All rights reserved.
-//       blog: https://www.unitymake.com
+//       blog: https://www.playcreator.cn
 //        email: yixiangluntan@163.com
 //-------------------------------------------------
 
 using System;
+using System.Reflection;
+using FlexiArchiveSystem.Assist;
 using FlexiArchiveSystem.Serialization;
 
-namespace FlexiArchiveSystem
+namespace FlexiArchiveSystem.DataType.Base
 {
-    public abstract partial class AbstractDataType<T> : IDataType, IEquatable<T>
+    public abstract partial class AbstractDataTypeWrapper<T> : IDataType, IEquatable<T>
     {
         [Serializable]
-        public class DataWraper<TData> 
+        public class DataResultWrapper<TData> 
         {
             public TData value;
         }
 
-        protected DataWraper<T> _dataWraper = new DataWraper<T>();
-        public T data => _dataWraper.value;
-        private T diskData;
-        public T DiskData => diskData;
+        protected DataResultWrapper<T> _dataWrapper = new DataResultWrapper<T>();
+        public T data => _dataWrapper.value;
+        private T _diskData;
+        public T diskData => _diskData;
         public event Action OnDirtyHandler;
         private DataTypeSystemInfo _systemInfo;
+        DataTypeSystemInfo IDataType.SystemInfo => _systemInfo;
         protected ArchiveOperationType _ArchiveOperationType;
-        DataTypeSystemInfo IDataType.SystemInfo
-        {
-            get => _systemInfo;
-        }
-        
-        
+        private MethodInfo _methodInfoOfWriteData;
 
-        public AbstractDataType(string dataStr)
+
+        public AbstractDataTypeWrapper(string dataStr)
         {
             if (string.IsNullOrEmpty(dataStr) == false)
             {
-                _dataWraper.value = DeSerialize(dataStr);
-                diskData = data;
+                _dataWrapper.value = DeSerialize(dataStr);
+                _diskData = data;
             }
 
             _systemInfo = new DataTypeSystemInfo(this.GetType().ToString());
+            // DataTypeBinder.Register(this.GetType(),typeof(T)); //暂时没用上
         }
 
         public void InjectArchiveOperationType(ArchiveOperationType archiveOperationType)
@@ -48,14 +48,23 @@ namespace FlexiArchiveSystem
             _ArchiveOperationType = archiveOperationType;
         }
 
+        public MethodInfo GetWriteDataMethodInfo()
+        {
+            if (_methodInfoOfWriteData == null)
+            {
+                _methodInfoOfWriteData = this.GetType().GetMethod(nameof(this.Write),BindingFlags.Public | BindingFlags.Instance);
+            }
+            return _methodInfoOfWriteData;
+        }
+
         public void Refresh()
         {
-            diskData = data;
+            _diskData = data;
         }
 
         public virtual string Serialize()
         {
-            return DataTypeSerializeOperation.Serialize(_ArchiveOperationType, _dataWraper);
+            return DataTypeSerializeOperation.Serialize(_ArchiveOperationType, _dataWrapper);
         }
 
         protected virtual T DeSerialize(string dataStr)
@@ -63,11 +72,21 @@ namespace FlexiArchiveSystem
             return DataTypeSerializeOperation.DeSerialize<T>(_ArchiveOperationType, dataStr);
         }
 
+        public void WriteByGenericObject(object genericValue)
+        {
+            if (genericValue is T concreteData)
+            {
+                Write(concreteData);
+                return;
+            }
+            Logger.LOG_ERROR("The data type does not match");
+        }
+        
         public void Write(T data)
         {
             if (Equals(data) == false)
             {
-                _dataWraper.value = data;
+                _dataWrapper.value = data;
                 OnDirtyHandler?.Invoke();
             }
         }
@@ -91,7 +110,7 @@ namespace FlexiArchiveSystem
 
         protected virtual string DiskDataToString()
         {
-            return ToString(diskData);
+            return ToString(_diskData);
         }
     }
 }

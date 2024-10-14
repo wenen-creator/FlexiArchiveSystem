@@ -1,7 +1,7 @@
 //-------------------------------------------------
 //            Flexi Archive System
 // Copyright (c) 2024 温文. All rights reserved.
-//       blog: https://www.unitymake.com
+//       blog: https://www.playcreator.cn
 //        email: yixiangluntan@163.com
 //-------------------------------------------------
 
@@ -56,13 +56,23 @@ namespace FlexiArchiveSystem.U3DEditor
                 var items = DataKeyHandler.GetAndProcessKeyCollection(key);
                 _window.UpdateKeyField(items.Item1, items.Item2);
             }
-            
+
             EditorApplication.playModeStateChanged += _window.OnPlayModeStateChanged;
             CompileListener.RegisterEvent(_window.WhenCompile);
 
             if (Application.isPlaying == false)
             {
                 InitAllArchiveManager();
+            }
+            
+            if (_window.DataArchiveManager == null)
+            {
+                string moduleName = _window.GetLastSelectArchiveSettingName();
+                if (string.IsNullOrEmpty(moduleName))
+                {
+                    moduleName = "Default";
+                }
+                _window.DataArchiveManager = ArchiveManagerRegister.instance.FindByArchiveSetting(moduleName);
             }
         }
 
@@ -126,6 +136,16 @@ namespace FlexiArchiveSystem.U3DEditor
         {
             PlayerPrefs.SetString("DataQueryEditor_LastQuery", key);
         }
+        
+        public string GetLastSelectArchiveSettingName()
+        {
+            return PlayerPrefs.GetString("DataQueryEditor_LastSelectArchiveSettingName", "");
+        }
+
+        public void RecordSelectArchiveSettingName(string moduleName)
+        {
+            PlayerPrefs.SetString("DataQueryEditor_LastSelectArchiveSettingName", moduleName);
+        }
 
         private void OnGUI()
         {
@@ -156,6 +176,11 @@ namespace FlexiArchiveSystem.U3DEditor
             field_archiveSetting =
                 EditorGUILayout.ObjectField(field_archiveSetting, typeof(FlexiArchiveSetting), false);
             bool isChangeSetting = EditorGUI.EndChangeCheck();
+            if (field_archiveSetting == null && DataArchiveManager !=null && DataArchiveManager.ArchiveSetting != null)
+            {
+                field_archiveSetting = DataArchiveManager.ArchiveSetting;
+                isChangeSetting = field_archiveSetting != null;
+            }
             if (isChangeSetting)
             {
                 if (field_archiveSetting != null)
@@ -166,9 +191,14 @@ namespace FlexiArchiveSystem.U3DEditor
                     if (mgr != null)
                     {
                         DataArchiveSetting = DataArchiveManager.ArchiveSetting;
+                        if (string.IsNullOrEmpty(DataArchiveSetting.ModuleName) == false)
+                        {
+                            field_archiveSetting.name = DataArchiveSetting.ModuleName;
+                        }
                         AllArchiveID = DataArchiveSetting.GetAllArchiveID();
                         isNonArchiveError = AllArchiveID == null || AllArchiveID.Count == 0;
                         selectArchiveID = DataArchiveSetting.CurrentArchiveID;
+                        RecordSelectArchiveSettingName(DataArchiveSetting.ModuleName);
                     }
                 }
             }
@@ -349,14 +379,13 @@ namespace FlexiArchiveSystem.U3DEditor
             }
             
             Type valueType = dataTypeSystemType.BaseType.GetGenericArguments()[0];
-            var methodInfo_GetData = dataObject.GetType().GetMethod("GetData");
+            var methodInfo_GetData = dataObject.GetType().GetMethod(nameof(dataObject.GetData),new Type[]{});
             methodInfo_GetData = methodInfo_GetData.MakeGenericMethod(dataTypeSystemType);
 
             object dataType = methodInfo_GetData.Invoke(dataObject, null);
-            Type genericDataType = Assembly.GetAssembly(typeof(IDataType)).GetType("FlexiArchiveSystem.AbstractDataType`1");
-            genericDataType = genericDataType.MakeGenericType(valueType);
+
             var methodInfo_DiskToStr =
-                genericDataType.GetMethod("DiskDataToString", BindingFlags.NonPublic | BindingFlags.Instance);
+                dataTypeSystemType.GetMethod("DiskDataToString", BindingFlags.NonPublic | BindingFlags.Instance);
             object diskDataStr = methodInfo_DiskToStr.Invoke(dataType, null);
             ResultWrapper resultWrapper = new ResultWrapper();
             resultWrapper.result = dataType.ToString();
@@ -435,6 +464,7 @@ namespace FlexiArchiveSystem.U3DEditor
             selectArchiveID = id;
             DataArchiveSetting.SetArchiveID(selectArchiveID, false);
             DataArchiveSetting.CreateOrRebuildArchiveOperation();
+            DataArchiveManager.ClearMemoryCache();
             keyValuePairs.Clear();
         }
 

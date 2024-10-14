@@ -8,16 +8,19 @@
 
 &ensp;&ensp; *Flexi Archive System* 系统采用了**高效**的存储机制。默认采用按需载入原则，通过合批、异步IO、缓存机制、分组策略、脏标记等大量优化策略，确保用户在进行大量频繁的数据操作时，也能够快速响应。得以轻松应对游戏中复杂需求。
 
-
-## 文档
-
-&ensp;&ensp;[Unity-Android申请读写权限配置流程](https://www.unitymake.com/archives/unity/3987)
+## 快速入门
 
 &ensp;&ensp;建议你在使用 *Flexi Archive* 前，先打开 **Sample** 案例。
 
 &ensp;&ensp;在 Sample 案例中，你可以快速学习到 *Flexi Archive System* 的核心功能。
 
 ![img](https://github.com/wenen-creator/FlexiArchiveSystem/blob/dev/Misc/img/preview01.PNG)
+
+## 文档
+
+&ensp;&ensp;[Flexi-Archive官方文档 - 温文](https://www.playcreator.cn/flexi-archive/)
+
+&ensp;&ensp;[Unity-Android申请读写权限配置流程 - 温文](https://www.playcreator.cn/archives/unity/3987)
 
 ## 系统特点
 
@@ -175,6 +178,6 @@
 
 author: 温文
 
-blog: https://www.unitymake.com
+blog: https://www.playcreator.cn
 
 email: yixiangluntan@163.com

@@ -1,12 +1,13 @@
 ﻿//-------------------------------------------------
 //            Flexi Archive System
 // Copyright (c) 2024 温文. All rights reserved.
-//       blog: https://www.unitymake.com
+//       blog: https://www.playcreator.cn
 //        email: yixiangluntan@163.com
 //-------------------------------------------------
 
 using System.Collections.Generic;
 using FlexiArchiveSystem.Setting;
+using UnityEngine;
 
 namespace FlexiArchiveSystem.Assist
 {
@@ -24,6 +25,13 @@ namespace FlexiArchiveSystem.Assist
                 Logger.LOG_ERROR("存档系统的 ModuleName 不能为空");
                 return;
             }
+
+            
+            if (ArchiveMgrMap.ContainsKey(ModuleName) && Application.isPlaying)
+            {
+                Logger.LOG_WARNING($"ModuleName：{ModuleName}重复注册。已经注册了名为 {mgr.GetType().Name} 的存档系统");
+            }
+
             ArchiveMgrMap[ModuleName] = mgr;
         }
         
@@ -40,7 +48,12 @@ namespace FlexiArchiveSystem.Assist
 
         public IFlexiDataArchiveManager FindByArchiveSetting(IArchiveSetting archiveSetting)
         {
-            ArchiveMgrMap.TryGetValue(archiveSetting.ModuleName, out var mgr);
+            return FindByArchiveSetting(archiveSetting.ModuleName);
+        }
+        
+        public IFlexiDataArchiveManager FindByArchiveSetting(string moduleName)
+        {
+            ArchiveMgrMap.TryGetValue(moduleName, out var mgr);
             return mgr;
         }
     }

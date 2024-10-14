@@ -1,6 +1,8 @@
-﻿namespace FlexiArchiveSystem
+﻿using FlexiArchiveSystem.DataType.Base;
+
+namespace FlexiArchiveSystem
 {
-    public class DataLong : AbstractDataType<long>
+    public class DataLong : AbstractDataTypeWrapper<long>
     {
         public DataLong(string dataStr) : base(dataStr)
         {
