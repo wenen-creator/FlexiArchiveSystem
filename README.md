@@ -30,38 +30,7 @@
 
 &ensp;&ensp;当然你也可以自由的[切换](https://www.playcreator.cn/docs/flexi-archive/manual/switch-archive/)、[克隆](https://www.playcreator.cn/docs/flexi-archive/manual/clone-archive/)、[删除](https://www.playcreator.cn/docs/flexi-archive/manual/del-archive/)存档。
 
-
-### 2.支持多种序列化方式 
-
-&ensp;&ensp;支持 File、PlayerPrefs、SQL-DB 异步序列化（存档/读档）方式。你可以根据项目模块需求以及性能考量，自由决定该模块存档系统所使用的序列化方式，默认为 SQL-DB 方式。
-
-&ensp;&ensp;多存档支持：
-
-1. File方式：支持多存档
-2. PlayerPrefs方式：出于性能考虑，暂不支持多存档
-3. SQL-DB方式：支持多存档
-
-&ensp;&ensp;分析：
-1. File方式(JSON)：适用于存档量需求适中的项目，方便用于云存档上传。 
-2. PlayerPrefs方式：适用于单个数据量小且每组存档量少的存档，访问较快。如记录下用户某个操作、用户本地所做的设置等。 
-3. SQL-DB方式：适用于存档量需求较大的项目，读取开销与压缩比相比File方式在大多情况下要低。
-
-### 3.支持创建多个存档系统 
-
-&ensp;&ensp;你可以根据程序模块的不同，自由的创建多个不同的存档系统。
-
-&ensp;&ensp;方便你根据具体的模块来定制扩展存档系统，也可以选择更适合该模块的序列化存档方式。
-
-### 4.支持同一设备下多账号存档共存
-
-&ensp;&ensp;在用户登录成功后设置 USER_KEY 即可。若你的程序无登录业务，你可以不用设置。
-示例：
-
-``` C#
-    void Into() { DataArchiveConstData.USER_KEY = "Wenen"; }
-```
-
-### 5.支持任何复杂类型或自定义类型
+### 2.支持任何复杂类型或自定义类型
 
 &ensp;&ensp;Flexi Archive System 支持轻松添加新的数据类型和存档策略，允许你存档自定义的复杂类型数据。
 
@@ -111,7 +80,7 @@
 见文章 [创建自定义数据类型 - Flexi Archive](https://www.playcreator.cn/docs/flexi-archive/manual/create-custom-data/)
 
 
-### 6.对象字段与数据绑定
+### 3.对象字段与数据绑定
 
 &ensp;&ensp;除了持有DataObject操作存档之外，Flexi Archive 还提供了对象字段与数据绑定方案。你可以将存档数据与对象的属性进行绑定。这意味着，你对字段成员的访问与赋值，等同于对存档数据的读写。
 
@@ -120,7 +89,22 @@
 &ensp;&ensp;见文档 ： [对象字段与数据绑定 - 简化存档流程](https://www.playcreator.cn/docs/flexi-archive/manual/properties-bind-data/)
 
 
-### 7.保存点存档 
+### 4.支持多种序列化方式 
+
+&ensp;&ensp;支持 File、PlayerPrefs、SQL-DB 异步序列化（存档/读档）方式。你可以根据项目模块需求以及性能考量，自由决定该模块存档系统所使用的序列化方式，默认为 SQL-DB 方式。
+
+&ensp;&ensp;多存档支持：
+
+1. File方式：支持多存档
+2. PlayerPrefs方式：出于性能考虑，暂不支持多存档
+3. SQL-DB方式：支持多存档
+
+&ensp;&ensp;分析：
+1. File方式(JSON)：适用于存档量需求适中的项目，方便用于云存档上传。 
+2. PlayerPrefs方式：适用于单个数据量小且每组存档量少的存档，访问较快。如记录下用户某个操作、用户本地所做的设置等。 
+3. SQL-DB方式：适用于存档量需求较大的项目，读取开销与压缩比相比File方式在大多情况下要低。
+
+### 5.保存点存档
 
 &ensp;&ensp;你需要在合适的时机，触发存档操作。否则你对数据的修改，只会使 Memory 的数据发生变化。
 
@@ -131,13 +115,29 @@
 
 &ensp;&ensp;见文档：[保存存档](https://www.playcreator.cn/docs/flexi-archive/manual/save-archive/)
 
-### 8.分组策略 
+### 6.分组策略
 
-&ensp;&ensp;Flexi Archive System 使用 GroupKey + DataKey 的分组策略，你可以根据你的业务来对数据进行分组。 
+&ensp;&ensp;Flexi Archive System 使用 GroupKey + DataKey 的分组策略，你可以根据你的业务来对数据进行分组。
 
-&ensp;&ensp;合理的分组有助于降低存档的开销。 
+&ensp;&ensp;合理的分组有助于降低存档的开销。
 
 &ensp;&ensp;我给出的最理想情况：将经常在同一时间内发生变化的数据划分为一组。
+
+### 7.支持同一设备下多账号存档共存
+
+&ensp;&ensp;在用户登录成功后设置 USER_KEY 即可。若你的程序无登录业务，你可以不用设置。
+示例：
+
+``` C#
+    void Into() { DataArchiveConstData.USER_KEY = "Wenen"; }
+```
+
+
+### 8.支持创建多个存档系统 
+
+&ensp;&ensp;你可以根据程序模块的不同，自由的创建多个不同的存档系统。 见文档：[创建存档系统](https://www.playcreator.cn/docs/flexi-archive/manual/create-archive-system/)
+
+&ensp;&ensp;方便你根据具体的模块来定制扩展存档系统，也可以选择更适合该模块的序列化存档方式。
 
 ### 9.数据存档监视工具 
 
