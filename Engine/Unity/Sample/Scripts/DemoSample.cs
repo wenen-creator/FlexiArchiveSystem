@@ -27,7 +27,9 @@ namespace FlexiArchiveSystem.Sample
 				return;
 			}
 
-			DeviceAccess.ApplyAccess();//高版本的安卓需要向设备申请权限，才能进行读写。
+			//Earlier versions of Android require permission from the device to read and write.
+			//高版本的安卓需要向设备申请权限，才能进行读写。
+			DeviceAccess.ApplyAccess();
 
 			DataArchiveConstData.USER_KEY = "Wenen"; //Set User‘s key
 			

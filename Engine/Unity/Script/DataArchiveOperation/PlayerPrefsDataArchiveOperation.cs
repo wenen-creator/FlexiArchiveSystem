@@ -15,7 +15,8 @@ using LitJson;
 namespace FlexiArchiveSystem.ArchiveOperation
 {
     /// <summary>
-    /// Playerprefs注册表形式的存档方式
+    /// Playerprefs Mode
+    /// notice: For performance reasons, this method does not currently support multiple archive coexistence.
     /// notice: 出于性能考虑，因此该方式目前不支持多存档共存。
     /// </summary>
     internal partial class PlayerPrefsDataArchiveOperation : IDataArchiveOperation

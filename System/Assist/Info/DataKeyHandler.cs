@@ -20,7 +20,7 @@ namespace FlexiArchiveSystem
             string dataKey = keys[1];
             if (string.IsNullOrEmpty(dataKey))
             {
-                throw new InvalidDataException("数据存档发生意外！数据的Key无效。");
+                throw new InvalidDataException("Archiving accident! The Key of the data is invalid.");
             }
 
             if (string.IsNullOrEmpty(groupKey))

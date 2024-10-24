@@ -10,7 +10,6 @@ using System;
 namespace FlexiArchiveSystem
 {
     /// <summary>
-    /// 存档系统
     /// Please go to Unity-IFlexiDataArchiveManager what is core code;
     /// </summary>
     public abstract partial class IFlexiDataArchiveManager

@@ -42,21 +42,21 @@ namespace FlexiArchiveSystem.ArchiveOperation
         public void RecordKey(int archiveID, string groupKey)
         {
             UpdateDirtyState(archiveID);
-            //记录key
+            //record the key
             TryAddGroupKey(groupKey);
         }
         
         public void RecordAllGroupKey(int archiveID, List<string> groupKeys)
         {
             UpdateDirtyState(archiveID);
-            //记录key
+            //record the key
             GroupKeys = groupKeys;
             groupKeysJsonData = ConvertToJsonData(groupKeys);
             WriteToDisk(groupKeysJsonData);
         }
         
         /// <summary>
-        /// 必须保证前后使用的helper是一致的，且数据为更改
+        /// Ensure that the helper is the same and the data is changed
         /// </summary>
         /// <param name="archiveID"></param>
         public async void RecordAllGroupKeyWhenClone(int archiveID)
@@ -153,7 +153,8 @@ namespace FlexiArchiveSystem.ArchiveOperation
             bool isUse = await IOHelper.FileIsInUse(filePath, 300,100);
             if (isUse)
             {
-                Logger.LOG_ERROR($"文件{filePath}长时间被占用，无法写入辅助信息");
+                Logger.LOG_ERROR($"File - {filePath} has been occupied for a long time and cannot write auxiliary information");
+                // Logger.LOG_ERROR($"文件{filePath}长时间被占用，无法写入辅助信息");
                 return;
             }
             using (StreamWriter streamWriter = new StreamWriter(filePath))

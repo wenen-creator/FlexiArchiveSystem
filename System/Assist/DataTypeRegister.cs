@@ -31,7 +31,7 @@ namespace FlexiArchiveSystem
         }
 
         /// <summary>
-        /// 需要先注册绑定
+        /// need to register the binding first
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>

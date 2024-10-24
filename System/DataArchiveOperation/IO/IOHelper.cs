@@ -41,7 +41,7 @@ namespace FlexiArchiveSystem.ArchiveOperation.IO
 
             if (intervalCheckTime < 20 || intervalCheckTime >= timeout)
             {
-                throw new Exception("间隔检测时间无效");
+                throw new Exception("The interval detection time is invalid");
             }
             
             float time = 0;

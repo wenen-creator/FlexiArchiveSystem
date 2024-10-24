@@ -22,14 +22,14 @@ namespace FlexiArchiveSystem.Assist
             string ModuleName = mgr.ArchiveSetting.ModuleName;
             if (string.IsNullOrEmpty(ModuleName))
             {
-                Logger.LOG_ERROR("存档系统的 ModuleName 不能为空");
+                Logger.LOG_ERROR("The ModuleName of the archive system cannot be empty");
                 return;
             }
 
             
             if (ArchiveMgrMap.ContainsKey(ModuleName) && Application.isPlaying)
             {
-                Logger.LOG_WARNING($"ModuleName：{ModuleName}重复注册。已经注册了名为 {mgr.GetType().Name} 的存档系统");
+                Logger.LOG_WARNING($"ModuleName：{ModuleName} re-registered。An archive system named {mgr.GetType().Name} has been registered");
             }
 
             ArchiveMgrMap[ModuleName] = mgr;

@@ -111,7 +111,7 @@ namespace FlexiArchiveSystem.Sample
 			GUI.Label(new Rect(50, 25, 120, 20), "Switch Archive");
 			if (int.TryParse(archiveID, out var value) == false)
 			{
-				Logger.LOG_ERROR("请输入存档ID数字");
+				Logger.LOG_ERROR("Please enter the archive ID number");
 				archiveID = lastArchiveID;
 			}
 

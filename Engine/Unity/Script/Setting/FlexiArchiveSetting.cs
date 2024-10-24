@@ -33,7 +33,7 @@ namespace FlexiArchiveSystem.Setting
         [SerializeField] private bool _AllowSaveDataSystemInfo = false;
         public bool IsAllowSaveDataSystemInfoInPlayerDevice => _AllowSaveDataSystemInfo;
 
-        [Header("存档系统标识")]
+        [Header("Archive System ID")]
         [SerializeField] private string _ModuleName;
         public string ModuleName => _ModuleName;
         public int CurrentArchiveID { get; private set; }
@@ -192,7 +192,7 @@ namespace FlexiArchiveSystem.Setting
                     }
                     break;
                 default:
-                    throw new Exception("ERROR：当前使用的存档方式，不支持多存档共存机制");
+                    throw new Exception("ERROR：ERROR: The current archive mode does not support the coexistence of multiple archives");
             }
 
             if (allArchiveID != null && allArchiveID.Count > 1)

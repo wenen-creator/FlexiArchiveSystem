@@ -163,8 +163,10 @@ namespace FlexiArchiveSystem.Entry
             var currentDataArchiveOperation = _dataArchiveSetting.DataArchiveOperation;
             if (currentDataArchiveOperation.IsValidation == false)
             {
-                Logger.LOG_WARNING("当前存档无效，将不会进行存档克隆。如有疑问，请检查存档无效的原因。\n" +
-                                   "存档无效条件：字节为0||不存在（或许曾经存在过）");
+                Logger.LOG_WARNING("The current archive is invalid and will not be cloned. please check why the archive is invalid.\n" +
+                                   "Archive invalid condition: byte is 0 or does not exist (or has existed)");
+                // Logger.LOG_WARNING("当前存档无效，将不会进行存档克隆。如有疑问，请检查存档无效的原因。\n" +
+                //                    "存档无效条件：字节为0||不存在（或许曾经存在过）");
                 return;
             }
 
@@ -189,12 +191,12 @@ namespace FlexiArchiveSystem.Entry
             }
             else
             {
-                throw new Exception("ERROR：当前使用的存档方式，不支持多存档共存机制");
+                throw new Exception("ERROR: The current archive mode does not support the coexistence of multiple archives");
             }
 
             _dataArchiveSetting.DataArchiveOperation = newDataArchiveOperation;
             _dataArchiveSetting.SetArchiveID(nextArchiveID);
-            if (_dataArchiveSetting.IsLog) Logger.LOG("克隆存档成功");
+            if (_dataArchiveSetting.IsLog) Logger.LOG("clone archive successful");
             complete?.Invoke();
         }
         

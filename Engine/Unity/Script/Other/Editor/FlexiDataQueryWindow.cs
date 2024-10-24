@@ -156,13 +156,13 @@ namespace FlexiArchiveSystem.U3DEditor
             EditorGUILayout.BeginHorizontal();
             if (field_archiveSetting == null)
             {
-                EditorGUILayout.HelpBox("请指定存档设置", MessageType.Error, true);
+                EditorGUILayout.HelpBox("please set the archive Settings", MessageType.Error, true);
             }
             else
             {
                 if (DataArchiveManager == null)
                 {
-                    EditorGUILayout.HelpBox("未查询到对应的存档系统", MessageType.Error, true);
+                    EditorGUILayout.HelpBox("No archive system found(未查询到对应的存档系统)", MessageType.Error, true);
                 }
             }
 
@@ -171,7 +171,7 @@ namespace FlexiArchiveSystem.U3DEditor
             EditorGUILayout.Space(10);
 
             EditorGUILayout.BeginHorizontal();
-            GUILayout.Label("系统配置:", GUILayout.Width(60));
+            GUILayout.Label("setting:", GUILayout.Width(50));
             EditorGUI.BeginChangeCheck();
             field_archiveSetting =
                 EditorGUILayout.ObjectField(field_archiveSetting, typeof(FlexiArchiveSetting), false);
@@ -209,12 +209,12 @@ namespace FlexiArchiveSystem.U3DEditor
                 EditorGUILayout.EndHorizontal();
                 EditorGUILayout.Space(10);
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.HelpBox("没有任何存档数据", MessageType.Warning, true);
+                EditorGUILayout.HelpBox("no archived data", MessageType.Warning, true);
             }
             else
             {
                 EditorGUILayout.Space(1, false);
-                GUILayout.Label("选择存档:", GUILayout.Width(60));
+                GUILayout.Label("select archive:", GUILayout.Width(90));
                 EditorGUI.BeginDisabledGroup(Application.isPlaying || DataArchiveSetting == null);
                 if (EditorGUILayout.DropdownButton(new GUIContent(DataArchiveConstData.GetArchiveKey(selectArchiveID)),
                         FocusType.Keyboard,
@@ -242,13 +242,13 @@ namespace FlexiArchiveSystem.U3DEditor
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.Space(10);
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.HelpBox("输入要查询的数据Key:", MessageType.Info, true);
+            EditorGUILayout.HelpBox("enter the data key you want to query:", MessageType.Info, true);
             // GUILayout.Label("",GUILayout.Width(125));
             float halfWidth = _window.position.width / 2;
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.Space(10);
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Mainkey: ", GUILayout.Width(60));
+            EditorGUILayout.LabelField("GroupKey: ", GUILayout.Width(60));
             _GroupKey = EditorGUILayout.TextField("", _GroupKey, GUILayout.ExpandWidth(true));
             EditorGUILayout.EndHorizontal();
 
@@ -260,7 +260,7 @@ namespace FlexiArchiveSystem.U3DEditor
             EditorGUILayout.Space(20);
 
             EditorGUILayout.BeginHorizontal();
-            bool clickQueryBtn = GUILayout.Button(new GUIContent("查询", "点击查看值"), GUI.skin.button, GUILayout.Height(21));
+            bool clickQueryBtn = GUILayout.Button(new GUIContent("Query", "click to watch value"), GUI.skin.button, GUILayout.Height(21));
             if (clickQueryBtn)
             {
                 if (DataArchiveManager == null)
@@ -276,7 +276,7 @@ namespace FlexiArchiveSystem.U3DEditor
             EditorGUILayout.EndHorizontal();
             if (isQueryError)
             {
-                EditorGUILayout.HelpBox("查询失败,输入的Key不存在", MessageType.Error, true);
+                EditorGUILayout.HelpBox("key does not exist", MessageType.Error, true);
             }
 
             if (keyValuePairs.Count > 0)
@@ -369,13 +369,13 @@ namespace FlexiArchiveSystem.U3DEditor
 #if UNITY_EDITOR && EDITOR_DEV_WENEN
                 if (dataTypeSystemType == null)
                 {
-                    Logger.LOG_ERROR("SystemInfo信息缺失");
+                    Logger.LOG_ERROR("The SystemInfo information is missing");
                 }
 #endif
             }
             catch (Exception)
             {
-                Logger.LOG_ERROR("获取SystemInfo出错");
+                Logger.LOG_ERROR("An error occurred while obtaining SystemInfo.");
             }
             
             Type valueType = dataTypeSystemType.BaseType.GetGenericArguments()[0];

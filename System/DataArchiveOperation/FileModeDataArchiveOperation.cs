@@ -413,7 +413,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
         {
             if (source is DictionaryJsonArchiveSourceWrapper == false)
             {
-                throw new Exception("克隆Source错误");
+                throw new Exception("clone source error");
             }
 
             var jsonSource = source as DictionaryJsonArchiveSourceWrapper;

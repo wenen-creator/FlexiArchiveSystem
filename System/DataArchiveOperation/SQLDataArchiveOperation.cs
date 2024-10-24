@@ -297,7 +297,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
                 bool isUse = await IOHelper.FileIsInUse(FilePath, 1000, 200);
                 if (isUse)
                 {
-                    Logger.LOG_ERROR($"文件{FilePath}长时间被占用，无法删除存档");
+                    Logger.LOG_ERROR($"File - {FilePath} has been occupied for a long time and cannot be deleted");
                     return;
                 }
                 Directory.Delete(Path, true);
@@ -404,7 +404,7 @@ namespace FlexiArchiveSystem.ArchiveOperation
             bool isUse = await IOHelper.FileIsInUse(wrapper.sourcePath, 1000 ,200);
             if (isUse)
             {
-                Logger.LOG_ERROR($"文件{wrapper.sourcePath}长时间被占用，无法克隆存档");
+                Logger.LOG_ERROR($"File -{wrapper.sourcePath} has been occupied for a long time and cannot clone archive");
                 return;
             }
 

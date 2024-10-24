@@ -106,7 +106,7 @@ namespace FlexiArchiveSystem
             
             if (_ArchiveSetting.IsLog)
             {
-                Logger.LOG($"数据存档更新 Group: [{_groupKey}] - [{dirtyDataObjectKeys.Count}]条");
+                Logger.LOG($"Data archive update | Group: [{_groupKey}] - [{dirtyDataObjectKeys.Count}]");
             }
 
             dirtyDataObjectKeys.Clear();
@@ -133,7 +133,7 @@ namespace FlexiArchiveSystem
            
             if (_ArchiveSetting.IsLog)
             {
-                Logger.LOG($"数据存档更新 Group: [{_groupKey}] - [{dirtyDataObjectKeys.Count}]条");
+                Logger.LOG($"Data archive update | Group: [{_groupKey}] - [{dirtyDataObjectKeys.Count}]");
             }
 
             dirtyDataObjectKeys.Clear();

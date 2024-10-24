@@ -17,9 +17,6 @@ using UnityEngine;
 
 namespace FlexiArchiveSystem
 {
-    /// <summary>
-    /// 存档系统
-    /// </summary>
     public abstract partial class IFlexiDataArchiveManager : IDisposable 
     {
         public FlexiArchiveSetting ArchiveSetting { get; protected set; }

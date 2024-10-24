@@ -21,7 +21,7 @@ namespace FlexiArchiveSystem
     /// because it serialize all meta information that is not related to the value, which is expensive.
     /// So I'm here to warn you that it's best not to use it in formal projects.
     /// </summary>
-    [Obsolete("Note: 我不推荐你使用这个序列化方式，因为该方式会序列与值无关的所有元信息，其开销是巨大的。因此我在这里警告你，最好不要在正式项目中使用它。")]
+    [Obsolete("Note: I don't recommend you use this serialization because of the performance overhead")]
     public partial class DataType_Object: AbstractDataTypeWrapper<System.Object>
     {
         public DataType_Object(string dataStr) : base(dataStr)

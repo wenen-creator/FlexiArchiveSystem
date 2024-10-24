@@ -76,6 +76,7 @@ namespace FlexiArchiveSystem
       }
       
       /// <summary>
+      /// Get an IDataType instance based on the DataType type.
       /// 根据DataType的类型来取得IDataType实例。
       /// </summary>
       /// <param name="dataTypeMeta"></param>
@@ -137,7 +138,7 @@ namespace FlexiArchiveSystem
             {
                temp?.Invoke();
                TryToSaveDataSystemInfo(groupKey, dataKey, dataTypeSystemInfo);
-               //TODO : 立刻执行还是等待任务完成
+               //TODO : Immediately or wait for the task to complete (立刻执行还是等待任务完成)
                OnPersistentHandler?.Invoke(_Key);
             });
          }
